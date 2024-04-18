@@ -1,6 +1,9 @@
 /**
  * @type {import('next').NextConfig}
  */
+
+const isProd = process.env.NODE_ENV === 'production'
+
 const nextConfig = {
   async redirects() {
     return [
@@ -12,6 +15,8 @@ const nextConfig = {
     ]
   },
   output: 'export',
+
+  basePath: isProd ? '/gallery-rudn' : '',
  
   // Optional: Change links `/me` -> `/me/` and emit `/me.html` -> `/me/index.html`
   // trailingSlash: true,
