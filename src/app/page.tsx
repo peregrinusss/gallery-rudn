@@ -6,7 +6,7 @@ type Props = {};
 
 // Корневая страница которая не используется
 // TODO: сделать редирект на страницу каталога если авторизован и на страницу авторизации если не авторизован
-const Page: FC<Props> = () => {
+const Home: FC<Props> = () => {
   return (
     <>
       <div className="absolute bottom-0">
@@ -26,4 +26,4 @@ const Page: FC<Props> = () => {
   );
 };
 
-export default Page;
+export default Home;
