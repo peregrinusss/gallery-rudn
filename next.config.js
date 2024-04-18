@@ -6,8 +6,8 @@ const nextConfig = {
   async redirects() {
     return [
       {
-        source: '/',
-        destination: '/signin', // Редирект на страницу авторизации
+        source: '/gallery-rudn',
+        destination: '/gallery-rudn/signin', // Редирект на страницу авторизации
         permanent: true, // false для временного редиректа (HTTP 302), true для постоянного (HTTP 301)
       },
     ]
