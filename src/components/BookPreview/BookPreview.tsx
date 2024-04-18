@@ -1,3 +1,4 @@
+import { imagePath } from "@/utils/utils";
 import Image from "next/image";
 import { FC } from "react";
 
@@ -16,7 +17,7 @@ const BookPreview: FC<Props> = ({ book }) => {
       <div className="relative z-10 h-[340px]">
         <Image
           alt="book-preview"
-          src="/test.jpg"
+          src={imagePath("/test.jpg")}
           fill
           style={{ objectFit: "cover" }}
         />

@@ -1,5 +1,6 @@
 "use client";
 import Button from "@/components/Button/Button";
+import { imagePath } from "@/utils/utils";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
@@ -87,7 +88,7 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
         {pathname.split("/").splice(-1)[0] === "signin" && (
           <Image
             alt="background"
-            src="/bg.png"
+            src={imagePath("/bg.png")}
             fill
             style={{ objectFit: "cover" }}
           />

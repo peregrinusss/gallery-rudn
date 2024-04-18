@@ -1,6 +1,7 @@
 "use client";
 import BookPreview from "@/components/BookPreview/BookPreview";
 import Input from "@/components/Input/Input";
+import { imagePath } from "@/utils/utils";
 import Image from "next/image";
 import React from "react";
 import { FiSearch } from "react-icons/fi";
@@ -44,7 +45,7 @@ const Page = () => {
         <div className="absolute left-0 top-0 w-full h-full z-10">
           <Image
             alt="book-preview"
-            src="/preview.jpeg"
+            src={imagePath("/preview.jpeg")}
             fill
             style={{ objectFit: "cover" }}
           />
