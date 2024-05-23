@@ -24,6 +24,7 @@ body {
   text-rendering: optimizeSpeed;
   line-height: 1.5;
   min-width: 320px;
+  overflow-x: hidden;
 }
 
 html {
@@ -131,4 +132,12 @@ input[type="search"]::-webkit-search-results-decoration {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+.swiper {
+  padding-bottom: 40px !important;
+}
+
+.swiper-pagination-bullet-active {
+  background: #0279C1 !important;
 }

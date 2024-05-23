@@ -15,7 +15,6 @@ const Page = () => {
         <Button onClick={() => {}} variant="primary" className="mt-6">
           Войти
         </Button>
-        <div className=""></div>
       </div>
     </div>
   );

@@ -13,8 +13,8 @@ type Props = {
 
 // Мета данные
 export const metadata: Metadata = {
-  title: "Выставка книг",
-  description: "Выставка книг",
+  title: "Выставка Мир и РУДНг",
+  description: "Выставка Мир и РУДН",
 };
 
 // Корневой лэйаут
