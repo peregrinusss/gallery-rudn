@@ -141,3 +141,7 @@ input[type="search"]::-webkit-search-results-decoration {
 .swiper-pagination-bullet-active {
   background: #0279C1 !important;
 }
+
+.ReactCollapse--collapse {
+  transition: height 500ms;
+}

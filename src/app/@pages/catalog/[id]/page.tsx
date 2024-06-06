@@ -1,123 +1,146 @@
 "use client";
 import Image from "next/image";
-import React, { useState } from "react";
+import React, { FC, useEffect, useState } from "react";
 import { Swiper, SwiperSlide } from "swiper/react";
 import { Navigation, Pagination, A11y } from "swiper/modules";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 
-// Import Swiper styles
+// Импорт Swiper стилей
 import "swiper/css";
 import "swiper/css/pagination";
+import { BookDetails, CatalogPagesParams } from "@/types";
+import { useGetBookByIdMutation } from "@/redux/app/apiSlice";
+import { createImageSrc } from "@/utils/utils";
+import { useRouter } from "next/navigation";
 
 // Страница авторизации
-const Page = () => {
-  // Фейковая дата книг
-  const data = [
-    { name: "Книга такая", author: "А.С. Пушкин" },
-    { name: "Энциклопедия", author: "А.С. Пушкин" },
-    { name: "Тайны прошлого", author: "Л.Н. Толстой" },
-    { name: "Звёздное небо", author: "А.С. Пушкин" },
-    { name: "Один день", author: "А.С. Пушкин" },
-    { name: "Сказки далёких стран", author: "В.А. Жуковский" },
-    { name: "Свет в окне", author: "М.Ю. Лермонтов" },
-    { name: "Летний дождь", author: "А.С. Пушкин" },
-    { name: "Приключения весны", author: "Н.В. Гоголь" },
-  ];
+const Page: FC<CatalogPagesParams> = ({ params }) => {
+  // Получения id текущей книги
+  const { id: bookId } = params;
+
+  // Получение переменной для навигации
+  const router = useRouter();
+
+  // Получение книги с апи
+  const [getBook] = useGetBookByIdMutation();
+  const [book, setBook] = useState<BookDetails>();
+
+  useEffect(() => {
+    const fetchBook = async () => {
+      try {
+        const result = await getBook({ id: bookId }).unwrap();
+        setBook(result);
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (bookId) {
+      fetchBook();
+    }
+  }, [bookId, getBook]);
 
   return (
-    <div className="">
-      <div className="flex flex-col sm:flex-row sm:items-end sm:gap-2">
-        <h2 className="text-3xl text-black font-bold">Тайны прошлого</h2>
-        <span className="text-xl text-gray-dark font-normal">Л.Н. Толстой</span>
+    <div className="relative z-20">
+      <div className="flex flex-col gap-2">
+        <div
+          onClick={() => router.push("/catalog")}
+          className="cursor-pointer active:opacity-70 transition-all flex items-center"
+        >
+          <MdKeyboardArrowLeft className="text-primary w-6 h-6" />
+          <span className="text-lg text-primary font-bold">Назад</span>
+        </div>
+        <h2 className="text-xl md:text-3xl text-black font-bold max-w-[800px]">
+          {book?.name ? book?.name : "Неизвестная книга"}
+        </h2>
+        <div className="flex gap-3 flex-wrap">
+          {book?.Authors[0].name ? (
+            book?.Authors?.map((author, index) => (
+              <span
+                key={index}
+                className="text-base md:text-xl text-gray-dark font-normal"
+              >
+                {author.name} {author.surname}
+              </span>
+            ))
+          ) : (
+            <span className="text-base md:text-xl text-gray-dark font-normal">
+              Неизвестный автор
+            </span>
+          )}
+        </div>
       </div>
       <div className="flex flex-col-reverse xl:grid xl:grid-cols-2 mt-5 gap-3 xl:gap-10">
-        <div className="w-full">
+        <div className="w-full flex flex-col gap-2">
           <p className="text-base text-black font-normal">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            Perspiciatis in unde debitis optio sequi voluptate? Qui sequi optio
-            cupiditate et quod obcaecati fugiat odit, ab recusandae illo, labore
-            rerum unde. Lorem ipsum dolor sit amet consectetur adipisicing elit.
-            Commodi laboriosam similique quibusdam minima perferendis itaque
-            consectetur nostrum est ipsam, fugiat inventore, numquam modi magni
-            quasi cupiditate! Incidunt magni sit eum?
+            {book?.description}
+          </p>
+          <p className="text-base text-black font-normal">
+            {book?.addInformation}
           </p>
         </div>
         <div className="relative">
-          <Swiper
-            spaceBetween={10}
-            slidesPerView={2}
-            breakpoints={{
-              // когда ширина окна >= 0px
-              0: {
-                slidesPerView: 1,
-                spaceBetween: 10,
-              },
-              // когда ширина окна >= 480px
-              480: {
-                slidesPerView: 2,
-                spaceBetween: 10,
-              },
-            }}
-            modules={[Pagination, A11y, Navigation]}
-            navigation={{
-              nextEl: ".swiper-button-next",
-              prevEl: ".swiper-button-prev",
-            }}
-            loop
-            pagination={{ clickable: true }}
-            className="relative"
-          >
-            <div className="swiper-button-prev absolute left-2 top-0 bottom-10 my-auto z-20 w-10 h-10 rounded-full bg-primary p-2 flex items-center justify-center active:opacity-70 transition-all cursor-pointer">
-              <MdKeyboardArrowLeft className="text-white w-full h-full" />
+          {book?.Images && book?.Images?.length > 2 ? (
+            <Swiper
+              spaceBetween={10}
+              slidesPerView={1}
+              breakpoints={{
+                0: {
+                  slidesPerView: 1,
+                  spaceBetween: 10,
+                },
+                480: {
+                  slidesPerView: 2,
+                  spaceBetween: 10,
+                },
+              }}
+              modules={[Pagination, A11y, Navigation]}
+              navigation={{
+                nextEl: ".swiper-button-next",
+                prevEl: ".swiper-button-prev",
+              }}
+              loop
+              pagination={{ clickable: true }}
+              className="relative"
+            >
+              <div className="swiper-button-prev absolute left-2 top-0 bottom-10 my-auto z-20 w-10 h-10 rounded-full bg-primary p-2 flex items-center justify-center active:opacity-70 transition-all cursor-pointer">
+                <MdKeyboardArrowLeft className="text-white w-full h-full" />
+              </div>
+              <div className="swiper-button-next absolute z-20 right-2 top-0 bottom-10 my-auto rotate-180 w-10 h-10 rounded-full bg-primary p-2 flex items-center justify-center active:opacity-70 transition-all cursor-pointer">
+                <MdKeyboardArrowLeft className="text-white w-full h-full" />
+              </div>
+              {book.Images.map((image, index) => (
+                <SwiperSlide key={index}>
+                  <div className="w-full h-[260px] md:h-[340px] rounded-[20px] 2xl:h-[400px] relative overflow-hidden">
+                    <Image
+                      alt="book"
+                      src={createImageSrc(image.path)}
+                      className="rounded-[20px]"
+                      fill
+                      style={{ objectFit: "contain" }}
+                    />
+                  </div>
+                </SwiperSlide>
+              ))}
+            </Swiper>
+          ) : (
+            <div className="flex items-center gap-2">
+              {book?.Images?.map((image, index) => (
+                <div
+                  key={index}
+                  className="w-full h-[260px] md:h-[300px] rounded-[20px] relative overflow-hidden"
+                >
+                  <Image
+                    alt="book"
+                    src={createImageSrc(image.path)}
+                    className="rounded-[20px]"
+                    fill
+                    style={{ objectFit: "contain" }}
+                  />
+                </div>
+              ))}
             </div>
-            <div className="swiper-button-next absolute z-20 right-2 top-0 bottom-10 my-auto rotate-180 w-10 h-10 rounded-full bg-primary p-2 flex items-center justify-center active:opacity-70 transition-all cursor-pointer">
-              <MdKeyboardArrowLeft className="text-white w-full h-full" />
-            </div>
-            <SwiperSlide>
-              <div className="w-full h-[260px] md:h-[340px] 2xl:h-[400px]">
-                <Image
-                  alt="book"
-                  src="/preview.jpeg"
-                  className="rounded-[20px]"
-                  fill
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div className="w-full h-[260px] md:h-[340px] 2xl:h-[400px]">
-                <Image
-                  alt="book"
-                  src="/book1.png"
-                  className="rounded-[20px]"
-                  fill
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div className="w-full h-[260px] md:h-[340px] 2xl:h-[400px]">
-                <Image
-                  alt="book"
-                  src="/book2.png"
-                  className="rounded-[20px]"
-                  fill
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-            </SwiperSlide>
-            <SwiperSlide>
-              <div className="w-full h-[260px] md:h-[340px] 2xl:h-[400px]">
-                <Image
-                  alt="book"
-                  src="/book3.png"
-                  className="rounded-[20px]"
-                  fill
-                  style={{ objectFit: "cover" }}
-                />
-              </div>
-            </SwiperSlide>
-          </Swiper>
+          )}
         </div>
       </div>
     </div>

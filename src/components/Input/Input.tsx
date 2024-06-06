@@ -13,9 +13,9 @@ type Props = {
 const Input: FC<Props> = ({ placeholder, type, label, className }) => {
   return (
     <div className={twMerge("w-full", className)}>
-      {label && <label className="block text-base font-normal mb-1">{label}</label>}
+      {label && <label className="block text-base text-black font-normal mb-1">{label}</label>}
       <input
-        className="w-full bg-transparent p-4 text-base text-blacks placeholder:text-base placeholder:text-[#9CA3AF] border border-gray rounded-[20px]"
+        className="w-full bg-transparent p-4 text-base text-black placeholder:text-base placeholder:text-[#9CA3AF] border border-gray rounded-[20px]"
         type={type}
         placeholder={placeholder}
       />

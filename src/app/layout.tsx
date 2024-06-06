@@ -1,7 +1,8 @@
 import "./globals.css";
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
-import { FC, PropsWithChildren } from "react";
+import { FC } from "react";
+import ClientProvider from "./ClientProvider";
 
 // Шрифт
 const montserrat = Montserrat({ subsets: ["latin"] });
@@ -13,7 +14,7 @@ type Props = {
 
 // Мета данные
 export const metadata: Metadata = {
-  title: "Выставка Мир и РУДНг",
+  title: "Выставка Мир и РУДН",
   description: "Выставка Мир и РУДН",
 };
 
@@ -22,7 +23,10 @@ const RootLayout: FC<Props> = ({ pages, children }) => {
   return (
     <html lang="en">
       <body className={montserrat.className}>
-        {pages}
+        <ClientProvider>
+          {pages}
+          {children}
+        </ClientProvider>
       </body>
     </html>
   );

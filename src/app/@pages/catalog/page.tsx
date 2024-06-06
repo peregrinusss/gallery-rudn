@@ -2,33 +2,20 @@
 import BookPreview from "@/components/BookPreview/BookPreview";
 import Input from "@/components/Input/Input";
 import Select from "@/components/Select/Select";
+import {
+  useGetBooksQuery,
+  useGetFilterOptionsQuery,
+} from "@/redux/app/apiSlice";
 import { imagePath } from "@/utils/utils";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React from "react";
+import React, { ChangeEvent, FC, useState } from "react";
 import { FiSearch } from "react-icons/fi";
+import { Collapse } from "react-collapse";
+import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
 // Страница авторизации
-const Page = () => {
-  // Фейковая дата книг
-  const data = [
-    { id: "1", name: "Книга такая", author: "А.С. Пушкин" },
-    { id: "2", name: "Энциклопедия", author: "А.С. Пушкин" },
-    { id: "3", name: "Тайны прошлого", author: "Л.Н. Толстой" },
-    { id: "4", name: "Звёздное небо", author: "А.С. Пушкин" },
-    { id: "5", name: "Один день", author: "А.С. Пушкин" },
-    { id: "6", name: "Сказки далёких стран", author: "В.А. Жуковский" },
-    { id: "7", name: "Свет в окне", author: "М.Ю. Лермонтов" },
-    { id: "8", name: "Летний дождь", author: "А.С. Пушкин" },
-    { id: "9", name: "Приключения весны", author: "Н.В. Гоголь" },
-  ];
-
-  const options = [
-    { value: "option1", label: "Option 1" },
-    { value: "option2", label: "Option 2" },
-    { value: "option3", label: "Option 3" },
-  ];
-
+const Page: FC = () => {
   const handleSelectChange = (selectedOption: {
     value: string;
     label: string;
@@ -36,8 +23,25 @@ const Page = () => {
     console.log("Selected option:", selectedOption);
   };
 
+  // Состояние раскрвтия фильтров
+  const [open, setOpen] = useState<boolean>(false);
+
+  const toggleOpen = () => {
+    if (open) {
+      setOpen(false);
+      return;
+    }
+
+    setOpen(true);
+  };
+
   // Переменная для роутинга
   const router = useRouter();
+
+  // Получения каталога книг с апи
+  const { data, error, isLoading } = useGetBooksQuery({});
+
+  const { data: fitlerOptions } = useGetFilterOptionsQuery({});
 
   return (
     <div className="">
@@ -69,19 +73,124 @@ const Page = () => {
         </div>
       </div>
       <div className="mt-6">
-        <span className="text-lg text-black font-semibold">Фильтр</span>
-        <div className="flex items-center gap-3 mt-2">
-          <Select options={options} onChange={handleSelectChange} />
-          <Select options={options} onChange={handleSelectChange} />
-          <Select options={options} onChange={handleSelectChange} />
+        <div
+          className="cursor-pointer active:opacity-70 transition-all flex items-center gap-2"
+          onClick={toggleOpen}
+        >
+          <span className="text-lg text-black font-semibold">Фильтр</span>
+          <MdOutlineKeyboardArrowDown
+            className={`text-black w-8 h-8 transition-all ${
+              open && "rotate-180"
+            }`}
+          />
         </div>
+
+        <Collapse isOpened={open}>
+          <div className="flex flex-wrap items-center gap-6 mt-2">
+            {fitlerOptions?.Author && (
+              <div className="flex flex-col gap-1">
+                <span className="text-base text-gray-dark font-normal">
+                  Автор
+                </span>
+                <Select
+                  options={fitlerOptions?.Author.map((item) => ({
+                    value: item.idAuthor,
+                    label: item.nameAuthor
+                      ? `${item.nameAuthor} ${item.surname} ${item.patronymic}`
+                      : item.entity,
+                  }))}
+                  onChange={handleSelectChange}
+                />
+              </div>
+            )}
+            {fitlerOptions?.Continent && (
+              <div className="flex flex-col gap-1">
+                <span className="text-base text-gray-dark font-normal">
+                  Континент
+                </span>
+                <Select
+                  options={fitlerOptions?.Continent.map((item) => ({
+                    value: item.idContinent,
+                    label: item.continent,
+                  }))}
+                  onChange={handleSelectChange}
+                />
+              </div>
+            )}
+            {fitlerOptions?.City && (
+              <div className="flex flex-col gap-1">
+                <span className="text-base text-gray-dark font-normal">
+                  Город
+                </span>
+                <Select
+                  options={fitlerOptions?.City.map((item) => ({
+                    value: item.idCity,
+                    label: item.city,
+                  }))}
+                  onChange={handleSelectChange}
+                />
+              </div>
+            )}
+            {fitlerOptions?.Country && (
+              <div className="flex flex-col gap-1">
+                <span className="text-base text-gray-dark font-normal">
+                  Страна
+                </span>
+                <Select
+                  options={fitlerOptions?.Country.map((item) => ({
+                    value: item.idCountry,
+                    label: item.country,
+                  }))}
+                  onChange={handleSelectChange}
+                />
+              </div>
+            )}
+            {fitlerOptions?.FederalDistrict && (
+              <div className="flex flex-col gap-1">
+                <span className="text-base text-gray-dark font-normal">
+                  Федеральный округ
+                </span>
+                <Select
+                  options={fitlerOptions?.FederalDistrict.map((item) => ({
+                    value: item.idFederalDistrict,
+                    label: item.federalDistrict,
+                  }))}
+                  onChange={handleSelectChange}
+                />
+              </div>
+            )}
+            {fitlerOptions?.SubjectRF && (
+              <div className="flex flex-col gap-1">
+                <span className="text-base text-gray-dark font-normal">
+                  Субъект РФ
+                </span>
+                <Select
+                  options={fitlerOptions?.SubjectRF.map((item) => ({
+                    value: item.idSubjectRF,
+                    label: item.subjectRF,
+                  }))}
+                  onChange={handleSelectChange}
+                />
+              </div>
+            )}
+          </div>
+        </Collapse>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-10">
-        {data.map((item, index) => (
-          <div onClick={() => router.push(`catalog/${item.id}`)} key={index}>
-            <BookPreview book={item} />
-          </div>
-        ))}
+        {data?.Records.length ? (
+          data?.Records?.map((item, index) => (
+            <div
+              onClick={() => router.push(`catalog/${item.id}`)}
+              key={item.id}
+            >
+              <BookPreview book={item} />
+            </div>
+          ))
+        ) : (
+          <span className="text-base text-black font-bold text-center">
+            Книги не найдены
+          </span>
+        )}
       </div>
     </div>
   );

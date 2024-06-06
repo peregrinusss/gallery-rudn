@@ -66,7 +66,7 @@ const Page = () => {
                 }}
               />
               <label
-                className="inline-block pl-[0.15rem] hover:cursor-pointer"
+                className="inline-block pl-[0.15rem] hover:cursor-pointer text-base text-black font-normal leading-6 transition-colors duration-200 ease-in-out"
                 htmlFor="checkboxDefault"
               >
                 Автор известен

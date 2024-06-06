@@ -1,33 +1,56 @@
-import React, { useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 
-interface Option {
+type Option = {
   value: string;
   label: string;
-}
+};
 
-interface CustomSelectProps {
+type CustomSelectProps = {
   options: Option[];
   onChange?: (selectedOption: Option) => void;
-}
+};
 
 const Select: React.FC<CustomSelectProps> = ({ options, onChange }) => {
+  // Состояния для управления открытием выпадающего списка
   const [isOpen, setIsOpen] = useState<boolean>(false);
-  const [selectedOption, setSelectedOption] = useState<Option>(options[0]);
 
+  // Состояние для выбора элемента выпадающего списка
+  const [selectedOption, setSelectedOption] = useState<Option | null>(null);
+
+  // Ссылка на DOM-элемент выпадающего списка
+  const inputRef = useRef<HTMLDivElement>(null);
+
+  // Обработчик клика по элементу выпадающего списка
   const handleOptionClick = (option: Option) => {
     setSelectedOption(option);
     setIsOpen(false);
     if (onChange) onChange(option);
   };
 
+  // Обработчик клика вне выпадающего списка для его закрытия
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
+        setIsOpen(false);
+      }
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
-    <div className="relative inline-block w-64">
+    <div className="relative inline-block w-full sm:w-64" ref={inputRef}>
       <div
-        className="bg-white border border-gray rounded-[20px] shadow-sm p-4 py-2 pr-10 text-left cursor-pointer focus:outline-none sm:text-sm"
+        className="h-[37px] bg-white border border-gray rounded-[20px] shadow-sm p-4 py-2 pr-10 text-left cursor-pointer focus:outline-none sm:text-sm"
         onClick={() => setIsOpen(!isOpen)}
       >
-        <span className="block truncate">{selectedOption.label}</span>
-        <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none">
+        <span className="block truncate text-black">
+          {selectedOption ? selectedOption.label : "Выбрать"}
+        </span>
+        <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none text-black">
           <svg
             className="h-5 w-5 text-gray-400"
             xmlns="http://www.w3.org/2000/svg"
@@ -44,24 +67,24 @@ const Select: React.FC<CustomSelectProps> = ({ options, onChange }) => {
         </span>
       </div>
       {isOpen && (
-        <div className="absolute z-40 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+        <div className="absolute z-40 mt-1 w-full bg-white shadow-lg max-h-60 rounded-[10px] py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
           {options.map((option) => (
             <div
               key={option.value}
-              className="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600 "
+              className="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-indigo-600"
               onClick={() => handleOptionClick(option)}
             >
               <span
                 className={`block truncate ${
-                  selectedOption.value === option.value
-                    ? "font-semibold"
-                    : "font-normal"
+                  selectedOption?.value === option.value
+                    ? "font-semibold text-primary"
+                    : "font-normal text-black"
                 }`}
               >
                 {option.label}
               </span>
-              {selectedOption.value === option.value && (
-                <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-indigo-600">
+              {selectedOption?.value === option.value && (
+                <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-primary">
                   <svg
                     className="h-5 w-5"
                     xmlns="http://www.w3.org/2000/svg"
