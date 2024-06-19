@@ -2,7 +2,7 @@ import "./globals.css";
 import type { Metadata } from "next";
 import { Montserrat } from "next/font/google";
 import { FC } from "react";
-import ClientProvider from "./ClientProvider";
+import Providers from "./providers";
 
 // Шрифт
 const montserrat = Montserrat({ subsets: ["latin"] });
@@ -23,10 +23,10 @@ const RootLayout: FC<Props> = ({ pages, children }) => {
   return (
     <html lang="en">
       <body className={montserrat.className}>
-        <ClientProvider>
+        <Providers>
           {pages}
           {children}
-        </ClientProvider>
+        </Providers>
       </body>
     </html>
   );
