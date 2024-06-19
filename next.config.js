@@ -3,14 +3,14 @@
  */
 
 const nextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: "/api/:path*",
-        destination: "http://95.165.168.235:65080/:path*", // Proxy to Backend
-      },
-    ];
-  },
+  // async rewrites() {
+  //   return [
+  //     {
+  //       source: "/api/:path*",
+  //       destination: "http://95.165.168.235:65080/:path*", // Proxy to Backend
+  //     },
+  //   ];
+  // },
 
   async redirects() {
     return [
