@@ -9,6 +9,7 @@ const montserrat = Montserrat({ subsets: ["latin"] });
 
 type Props = {
   children: React.ReactNode;
+  pages: React.ReactNode;
 };
 
 // Мета данные
@@ -18,11 +19,14 @@ export const metadata: Metadata = {
 };
 
 // Корневой лэйаут
-const RootLayout: FC<Props> = ({ children }) => {
+const RootLayout: FC<Props> = ({ children, pages }) => {
   return (
     <html lang="en">
       <body className={montserrat.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          {pages}
+          {children}
+        </Providers>
       </body>
     </html>
   );
