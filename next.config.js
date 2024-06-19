@@ -22,6 +22,8 @@ const nextConfig = {
     ];
   },
 
+  output: "export",
+
   basePath: process.env.NEXT_PUBLIC_BASE_PATH || "",
 
   // Optional: Change links `/me` -> `/me/` and emit `/me.html` -> `/me/index.html`
