@@ -5,7 +5,7 @@ import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 export const apiSlice = createApi({
   reducerPath: "api",
   baseQuery: fetchBaseQuery({
-    baseUrl: "/api/RUDN_Gallery/php/interface/", // Updated to use the proxy
+    baseUrl: "http://95.165.168.235:65080/RUDN_Gallery/php/interface/", // Updated to use the proxy
   }),
   endpoints: (builder) => ({
     getBooks: builder.query<Books, {}>({
