@@ -24,7 +24,7 @@ const RootLayout: FC<Props> = ({ pages, children }) => {
     <html lang="en">
       <body className={montserrat.className}>
         <Providers>
-          {pages}
+          {/* {pages} */}
           {children}
         </Providers>
       </body>
