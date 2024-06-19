@@ -8,7 +8,6 @@ import Providers from "./providers";
 const montserrat = Montserrat({ subsets: ["latin"] });
 
 type Props = {
-  pages: React.ReactNode;
   children: React.ReactNode;
 };
 
@@ -19,14 +18,11 @@ export const metadata: Metadata = {
 };
 
 // Корневой лэйаут
-const RootLayout: FC<Props> = ({ pages, children }) => {
+const RootLayout: FC<Props> = ({ children }) => {
   return (
     <html lang="en">
       <body className={montserrat.className}>
-        <Providers>
-          {/* {pages} */}
-          {children}
-        </Providers>
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
