@@ -43,13 +43,15 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
               />
             </div>
 
-            <Button
-              onClick={() => router.push("/book-add")}
-              variant="primary"
-              className="!w-fit flex-shrink-0 !px-10 !h-full"
-            >
-              Добавить книгу
-            </Button>
+            {pathname.split("/").splice(-1)[0] !== "book-add" && (
+              <Button
+                onClick={() => router.push("/book-add")}
+                variant="primary"
+                className="!w-fit flex-shrink-0 !px-10 !h-full"
+              >
+                Добавить книгу
+              </Button>
+            )}
           </header>
         )}
 
@@ -69,7 +71,7 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
           </motion.div>
         </main>
 
-        <div className="fixed bottom-0 bg-[#333] p-6 gap-2 rounded-t-[30px] mx-auto left-0 right-0 z-50">
+        {/* <div className="fixed bottom-0 bg-[#333] p-6 gap-2 rounded-t-[30px] mx-auto left-0 right-0 z-50">
           <span className="text-xl font-normal text-white">
             Временная навигация по страницам
           </span>
@@ -87,7 +89,7 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
               Создание книги
             </Link>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {/* Фон */}

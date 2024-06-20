@@ -79,7 +79,7 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
             {book?.addInformation}
           </p>
         </div>
-        <div className="relative">
+        <div className="relative shadow-xl rounded-[20px]">
           {book?.Images && book?.Images?.length > 2 ? (
             <Swiper
               spaceBetween={10}

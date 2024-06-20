@@ -1,21 +1,53 @@
 "use client";
 import BookPreview from "@/components/BookPreview/BookPreview";
-import Input from "@/components/Input/Input";
+import Search from "@/components/Search/Search";
 import Select from "@/components/Select/Select";
 import {
+  useFilterCatalogMutation,
   useGetBooksQuery,
   useGetFilterOptionsQuery,
 } from "@/redux/app/apiSlice";
+import { Book, Books } from "@/types";
 import { imagePath } from "@/utils/utils";
+import {
+  parseAsString,
+  ParserBuilder,
+  useQueryState,
+  useQueryStates,
+} from "next-usequerystate";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import React, { ChangeEvent, FC, useState } from "react";
-import { FiSearch } from "react-icons/fi";
+import { FC, useEffect, useState } from "react";
 import { Collapse } from "react-collapse";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
 // Страница авторизации
 const Page: FC = () => {
+  const [q, setQ] = useQueryState("q");
+
+  // Переменная для роутинга
+  const router = useRouter();
+
+  // Получения каталога книг с апи
+  const { data: booksData, isLoading, error } = useGetBooksQuery({});
+
+  const { data: fitlerOptions } = useGetFilterOptionsQuery({});
+  const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
+
+  useEffect(() => {
+    if (booksData && booksData.Records) {
+      setFilteredBooks(booksData.Records);
+    }
+  }, [booksData]);
+
+  const handleSearchTasks = (value: string) => {
+    if (!value) {
+      setQ(null);
+      return;
+    }
+    setQ(value);
+  };
+
   const handleSelectChange = (selectedOption: {
     value: string;
     label: string;
@@ -30,18 +62,22 @@ const Page: FC = () => {
     if (open) {
       setOpen(false);
       return;
-    }
+    } 
 
     setOpen(true);
   };
 
-  // Переменная для роутинга
-  const router = useRouter();
-
-  // Получения каталога книг с апи
-  const { data, error, isLoading } = useGetBooksQuery({});
-
-  const { data: fitlerOptions } = useGetFilterOptionsQuery({});
+  // Обработка поискового запроса
+  useEffect(() => {
+    if (booksData && booksData.Records) {
+      const filtered = booksData.Records.filter(book => {
+        // Замена null значения на "Неизвестная книга"
+        const bookName = book.name || "Неизвестная книга";
+        return q ? bookName.toLowerCase().includes(q.toLowerCase()) : true;
+      });
+      setFilteredBooks(filtered);
+    }
+  }, [booksData, q]);
 
   return (
     <div className="">
@@ -54,14 +90,11 @@ const Page: FC = () => {
           <span className="text-base md:text-xl text-white font-normal">
             Здесь вы можете найти книгу на интересующую вас тему
           </span>
-          <div className="relative w-full mt-10">
-            <FiSearch className="absolute top-1/2 -translate-y-1/2 left-3 w-6 h-6 text-[#9CA3AF]" />
-            <Input
-              placeholder="Поиск"
-              type="text"
-              className="[&>input]:pl-12 [&>input]:text-white"
-            />
-          </div>
+          <Search
+            setValue={handleSearchTasks}
+            value={q ?? ""}
+            placeholder="Поиск"
+          />
         </div>
         <div className="absolute left-0 top-0 w-full h-full z-10">
           <Image
@@ -77,7 +110,7 @@ const Page: FC = () => {
           className="cursor-pointer active:opacity-70 transition-all flex items-center gap-2"
           onClick={toggleOpen}
         >
-          <span className="text-lg text-black font-semibold">Фильтр</span>
+          <span className="text-xl text-primary font-semibold">Фильтр</span>
           <MdOutlineKeyboardArrowDown
             className={`text-black w-8 h-8 transition-all ${
               open && "rotate-180"
@@ -177,8 +210,8 @@ const Page: FC = () => {
         </Collapse>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-10">
-        {data?.Records.length ? (
-          data?.Records?.map((item, index) => (
+        {filteredBooks?.length ? (
+          filteredBooks?.map((item, index) => (
             <div
               onClick={() => router.push(`catalog/${item.id}`)}
               key={item.id}

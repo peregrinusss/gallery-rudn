@@ -145,3 +145,7 @@ input[type="search"]::-webkit-search-results-decoration {
 .ReactCollapse--collapse {
   transition: height 500ms;
 }
+
+.notistack-SnackbarContainer {
+  left: 0 !important;
+}
