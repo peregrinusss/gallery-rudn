@@ -215,7 +215,7 @@ export const apiSlice = createApi({
         params,
       }),
     }),
-    addSRF: builder.mutation<{}, { sRF: string; idFd: number }>({
+    addSRF: builder.mutation<{}, { sRF: string; idFD: number }>({
       query: (body) => ({
         url: "function/addDataDB/addS_RF.php",
         method: "POST",

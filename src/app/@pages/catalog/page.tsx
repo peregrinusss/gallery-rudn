@@ -62,7 +62,7 @@ const Page: FC = () => {
     if (open) {
       setOpen(false);
       return;
-    } 
+    }
 
     setOpen(true);
   };
@@ -70,7 +70,7 @@ const Page: FC = () => {
   // Обработка поискового запроса
   useEffect(() => {
     if (booksData && booksData.Records) {
-      const filtered = booksData.Records.filter(book => {
+      const filtered = booksData.Records.filter((book) => {
         // Замена null значения на "Неизвестная книга"
         const bookName = book.name || "Неизвестная книга";
         return q ? bookName.toLowerCase().includes(q.toLowerCase()) : true;
@@ -87,9 +87,14 @@ const Page: FC = () => {
           <h2 className="text-3xl md:text-5xl text-primary font-semibold">
             Коллекция книг
           </h2>
-          <span className="text-base md:text-xl text-white font-normal">
-            Здесь вы можете найти книгу на интересующую вас тему
-          </span>
+          <div className="flex flex-col gap-1">
+            <span className="text-base md:text-xl text-white font-normal">
+              Здесь вы можете найти книгу по интересующей вас стране.
+            </span>
+            <span className="text-base md:text-xl text-white font-normal">
+            С книгой ознакомиться можно ознакомиться в библиотке главного корпуса РУДН.
+            </span>
+          </div>
           <Search
             setValue={handleSearchTasks}
             value={q ?? ""}

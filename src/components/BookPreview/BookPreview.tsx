@@ -17,7 +17,7 @@ const BookPreview: FC<Props> = ({ book }) => {
           alt="book-preview"
           src={createImageSrc(book.path)}
           fill
-          style={{ objectFit: "cover" }}
+          style={{ objectFit: "contain" }}
         />
       </div>
       <div className="flex flex-col gap-2 py-6 px-5 bg-white group-hover:bg-[#f1f4ff] transition-all duration-300 rounded-[20px] relative z-20 -mt-10 border border-gray">

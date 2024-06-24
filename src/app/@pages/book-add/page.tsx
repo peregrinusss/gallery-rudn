@@ -162,7 +162,7 @@ const Page = () => {
     try {
       const res = await addSubrf({
         sRF,
-        idFd,
+        idFD: idFd,
       }).unwrap();
       setSRF("");
       enqueueSnackbar("Субъект РФ успешно добавлен", { variant: "success" });
