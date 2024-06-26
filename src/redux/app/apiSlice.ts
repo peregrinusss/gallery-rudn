@@ -89,12 +89,12 @@ export type AuthorResponse = {
 // Все запросы к апи
 export const apiSlice = createApi({
   reducerPath: "api",
-  // baseQuery: fetchBaseQuery({
-  //   baseUrl: "http://95.165.168.235:65080/RUDN_Gallery/php/interface/",
-  // }),
   baseQuery: fetchBaseQuery({
-    baseUrl: "/api/RUDN_Gallery/php/", // Используем прокси
+    baseUrl: "http://95.165.168.235:65080/RUDN_Gallery/php/",
   }),
+  // baseQuery: fetchBaseQuery({
+  //   baseUrl: "/api/RUDN_Gallery/php/", // Используем прокси
+  // }),
   endpoints: (builder) => ({
     getBooks: builder.query<Books, {}>({
       query: (params) => ({
