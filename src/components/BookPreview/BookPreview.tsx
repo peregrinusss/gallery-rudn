@@ -11,8 +11,8 @@ type Props = {
 // Компонент предпросмотра книги
 const BookPreview: FC<Props> = ({ book }) => {
   return (
-    <div className="rounded-[20px] overflow-hidden cursor-pointer group shadow-lg">
-      <div className="relative z-10 h-[340px]">
+    <div className="rounded-[20px] overflow-hidden cursor-pointer group shadow-lg bg-white">
+      <div className="relative z-10 h-[340px] rounded-[10px] overflow-hidden">
         <Image
           alt="book-preview"
           src={createImageSrc(book.path)}
@@ -20,7 +20,7 @@ const BookPreview: FC<Props> = ({ book }) => {
           style={{ objectFit: "contain" }}
         />
       </div>
-      <div className="flex flex-col gap-2 py-6 px-5 bg-white group-hover:bg-[#f1f4ff] transition-all duration-300 rounded-[20px] relative z-20 -mt-10 border border-gray">
+      <div className="flex flex-col gap-2 py-6 px-5 bg-white group-hover:bg-[#f1f4ff] transition-all duration-300 rounded-[20px] relative z-20 -mt-10 border border-primary">
         <h3 className="text-xl text-black font-semibold truncate">
           {book.name ? book.name : "Неизвестная книга"}
         </h3>

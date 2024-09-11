@@ -11,8 +11,8 @@ const config: Config = {
   ],
   theme: {
     colors: {
-      "primary": "#0279C1",
-      "gray": "#D7D8E4",
+      "primary": "#2c79e8",
+      "gray": "#f5f4fa",
       "gray-dark": "#00000080",
       "danger": "#FE4845",
       "success": "#39CD3F",
@@ -26,6 +26,10 @@ const config: Config = {
         "gradient-radial": "radial-gradient(var(--tw-gradient-stops))",
         "gradient-conic":
           "conic-gradient(from 180deg at 50% 50%, var(--tw-gradient-stops))",
+      },
+      fontFamily: {
+        "Centro": "var(--font-Centro)",
+        "Agora": "var(--font-Agora)",
       },
     },
     screens: {

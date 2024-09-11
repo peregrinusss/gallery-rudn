@@ -20,7 +20,7 @@ const Button: FC<PropsWithChildren<Props>> = ({
 }) => {
   // Стили в зависимости от варианта кнопки
   const buttonClasses = [
-    "flex items-center justify-center py-4 px-[6px] w-full h-fit rounded-[20px] text-base font-medium border border-transparent active:opacity-[0.6] transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-[0.6]",
+    "flex items-center justify-center py-3 !px-[24px] w-full h-fit rounded-full text-[15px] font-medium border border-transparent active:opacity-[0.6] transition-all duration-300 disabled:cursor-not-allowed disabled:opacity-[0.6]",
     className,
     variant === "primary" && "text-white bg-primary",
     variant === "danger" && "text-danger bg-danger bg-opacity-10",

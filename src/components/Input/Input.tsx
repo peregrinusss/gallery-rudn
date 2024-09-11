@@ -22,7 +22,7 @@ const Input: FC<Props> = ({ placeholder, type, label, className, ...rest }) => {
       )}
       <input
         {...rest}
-        className="w-full bg-transparent p-4 text-base text-black placeholder:text-base placeholder:text-[#9CA3AF] border border-gray rounded-[20px]"
+        className="w-full bg-white shadow-sm px-5 py-3 text-sm text-black placeholder:text-sm placeholder:text-[#9CA3AF] rounded-full"
         type={type}
         placeholder={placeholder}
       />

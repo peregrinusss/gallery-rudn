@@ -81,46 +81,62 @@ const Page: FC = () => {
 
   return (
     <div className="">
-      <div className="relative rounded-[20px] overflow-hidden px-4 py-8 md:p-14 -mx-5 sm:mx-0 2xl:-mx-14">
-        <div className="absolute z-20 w-full h-full left-0 top-0 bg-gradient-to-r from-black to-transparent"></div>
-        <div className="flex flex-col gap-3 relative z-30">
-          <h2 className="text-3xl md:text-5xl text-primary font-semibold">
-            Коллекция книг
+      <div className="relative rounded-[20px]">
+        {/* <div className="absolute z-20 w-full h-full left-0 top-0 bg-gradient-to-r from-black to-transparent"></div> */}
+        <div className="flex flex-col gap-4 relative z-30">
+          <h2 className="text-4xl text-black font-semibold font-Agora">
+            <span className="text-primary">Мир и РУДН:</span> коллекция книг
           </h2>
           <div className="flex flex-col gap-1">
-            <span className="text-base md:text-xl text-white font-normal">
+            <span className="text-sm md:text-base text-gray-dark font-normal">
               Здесь вы можете найти книгу по интересующей вас стране.
             </span>
-            <span className="text-base md:text-xl text-white font-normal">
-            С книгой ознакомиться можно ознакомиться в библиотке главного корпуса РУДН.
+            <span className="text-sm md:text-base text-gray-dark font-normal">
+              Погрузитесь в мир книг в библиотеке РУДН!
             </span>
           </div>
-          <Search
-            setValue={handleSearchTasks}
-            value={q ?? ""}
-            placeholder="Поиск"
-          />
+          <div className="mt-4">
+            <Search
+              setValue={handleSearchTasks}
+              value={q ?? ""}
+              placeholder="Поиск"
+            />
+          </div>
         </div>
-        <div className="absolute left-0 top-0 w-full h-full z-10">
+        {/* <div className="absolute left-0 top-0 w-full h-full z-10">
           <Image
             alt="book-preview"
             src={imagePath("/preview.jpeg")}
             fill
             style={{ objectFit: "cover" }}
           />
-        </div>
+        </div> */}
       </div>
-      <div className="mt-6">
+      <div className="mt-14">
         <div
           className="cursor-pointer active:opacity-70 transition-all flex items-center gap-2"
           onClick={toggleOpen}
         >
           <span className="text-xl text-primary font-semibold">Фильтр</span>
-          <MdOutlineKeyboardArrowDown
+          {/* <MdOutlineKeyboardArrowDown
             className={`text-black w-8 h-8 transition-all ${
               open && "rotate-180"
             }`}
-          />
+          /> */}
+          <div className={`transition-all ${open && "rotate-180"}`}>
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M12 15.5C11.7374 15.5005 11.4772 15.449 11.2346 15.3486C10.9919 15.2482 10.7715 15.1009 10.586 14.915L5.29297 9.62102L6.70697 8.20702L12 13.5L17.293 8.20702L18.707 9.62102L13.414 14.914C13.2285 15.1001 13.0081 15.2476 12.7655 15.3482C12.5228 15.4487 12.2626 15.5003 12 15.5Z"
+                fill="#030631"
+              ></path>
+            </svg>
+          </div>
         </div>
 
         <Collapse isOpened={open}>
@@ -214,7 +230,7 @@ const Page: FC = () => {
           </div>
         </Collapse>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-10">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-6">
         {filteredBooks?.length ? (
           filteredBooks?.map((item, index) => (
             <div

@@ -79,7 +79,7 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
             {book?.addInformation}
           </p>
         </div>
-        <div className="relative shadow-xl rounded-[20px]">
+        <div className="relative  rounded-[20px]">
           {book?.Images && book?.Images?.length > 2 ? (
             <Swiper
               spaceBetween={10}
@@ -111,7 +111,7 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
               </div>
               {book.Images.map((image, index) => (
                 <SwiperSlide key={index}>
-                  <div className="w-full h-[260px] md:h-[340px] rounded-[20px] 2xl:h-[400px] relative overflow-hidden">
+                  <div className="w-full h-[260px] md:h-[340px] rounded-[10px] 2xl:h-[400px] relative overflow-hidden shadow-md">
                     <Image
                       alt="book"
                       src={createImageSrc(image.path)}
@@ -128,7 +128,7 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
               {book?.Images?.map((image, index) => (
                 <div
                   key={index}
-                  className="w-full h-[260px] md:h-[300px] rounded-[20px] relative overflow-hidden"
+                  className="w-full h-[260px] md:h-[300px] rounded-[10px] relative overflow-hidden shadow-md bg-white"
                 >
                   <Image
                     alt="book"
