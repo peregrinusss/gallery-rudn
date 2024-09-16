@@ -1,7 +1,8 @@
 "use client";
 import BookPreview from "@/components/BookPreview/BookPreview";
+import InputRange from "@/components/InputRange/InputRange";
 import Search from "@/components/Search/Search";
-import Select from "@/components/Select/Select";
+import Select, { Option } from "@/components/Select/Select";
 import {
   useFilterCatalogMutation,
   useGetBooksQuery,
@@ -17,7 +18,7 @@ import {
 } from "next-usequerystate";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { FC, useEffect, useState } from "react";
+import { ChangeEvent, FC, useEffect, useState } from "react";
 import { Collapse } from "react-collapse";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
@@ -48,11 +49,8 @@ const Page: FC = () => {
     setQ(value);
   };
 
-  const handleSelectChange = (selectedOption: {
-    value: string;
-    label: string;
-  }) => {
-    console.log("Selected option:", selectedOption);
+  const handleSelectChange = (selectedOption: Option) => {
+
   };
 
   // Состояние раскрвтия фильтров
@@ -84,15 +82,16 @@ const Page: FC = () => {
       <div className="relative rounded-[20px]">
         {/* <div className="absolute z-20 w-full h-full left-0 top-0 bg-gradient-to-r from-black to-transparent"></div> */}
         <div className="flex flex-col gap-4 relative z-30">
-          <h2 className="text-4xl text-black font-semibold font-Agora">
+          <h2 className="text-5xl text-black font-semibold font-Agora">
             <span className="text-primary">Мир и РУДН:</span> коллекция книг
           </h2>
           <div className="flex flex-col gap-1">
-            <span className="text-sm md:text-base text-gray-dark font-normal">
-              Здесь вы можете найти книгу по интересующей вас стране.
+            <span className="text-base md:text-lg text-black font-normal">
+              Книги о странах, городах, объектах культурного наследия
             </span>
-            <span className="text-sm md:text-base text-gray-dark font-normal">
-              Погрузитесь в мир книг в библиотеке РУДН!
+            <span className="text-base md:text-lg text-black font-normal">
+              Смотрите и читайте печатные издания в научной библиотеке, главное
+              здание РУДН
             </span>
           </div>
           <div className="mt-4">
@@ -140,23 +139,7 @@ const Page: FC = () => {
         </div>
 
         <Collapse isOpened={open}>
-          <div className="flex flex-wrap items-center gap-6 mt-2">
-            {fitlerOptions?.Author && (
-              <div className="flex flex-col gap-1">
-                <span className="text-base text-gray-dark font-normal">
-                  Автор
-                </span>
-                <Select
-                  options={fitlerOptions?.Author.map((item) => ({
-                    value: item.idAuthor,
-                    label: item.nameAuthor
-                      ? `${item.nameAuthor} ${item.surname} ${item.patronymic}`
-                      : item.entity,
-                  }))}
-                  onChange={handleSelectChange}
-                />
-              </div>
-            )}
+          <div className="flex flex-wrap items-start gap-6 mt-2">
             {fitlerOptions?.Continent && (
               <div className="flex flex-col gap-1">
                 <span className="text-base text-gray-dark font-normal">
@@ -167,21 +150,7 @@ const Page: FC = () => {
                     value: item.idContinent,
                     label: item.continent,
                   }))}
-                  onChange={handleSelectChange}
-                />
-              </div>
-            )}
-            {fitlerOptions?.City && (
-              <div className="flex flex-col gap-1">
-                <span className="text-base text-gray-dark font-normal">
-                  Город
-                </span>
-                <Select
-                  options={fitlerOptions?.City.map((item) => ({
-                    value: item.idCity,
-                    label: item.city,
-                  }))}
-                  onChange={handleSelectChange}
+                  // onChange={handleSelectChange}
                 />
               </div>
             )}
@@ -195,21 +164,35 @@ const Page: FC = () => {
                     value: item.idCountry,
                     label: item.country,
                   }))}
-                  onChange={handleSelectChange}
+                  // onChange={handleSelectChange}
+                />
+              </div>
+            )}
+            {fitlerOptions?.City && (
+              <div className="flex flex-col gap-1">
+                <span className="text-base text-gray-dark font-normal">
+                  Город
+                </span>
+                <Select
+                  options={fitlerOptions?.City.map((item) => ({
+                    value: item.idCity,
+                    label: item.city,
+                  }))}
+                  // onChange={handleSelectChange}
                 />
               </div>
             )}
             {fitlerOptions?.FederalDistrict && (
               <div className="flex flex-col gap-1">
                 <span className="text-base text-gray-dark font-normal">
-                  Федеральный округ
+                  Федеральный округ России
                 </span>
                 <Select
                   options={fitlerOptions?.FederalDistrict.map((item) => ({
                     value: item.idFederalDistrict,
                     label: item.federalDistrict,
                   }))}
-                  onChange={handleSelectChange}
+                  // onChange={handleSelectChange}
                 />
               </div>
             )}
@@ -223,14 +206,34 @@ const Page: FC = () => {
                     value: item.idSubjectRF,
                     label: item.subjectRF,
                   }))}
-                  onChange={handleSelectChange}
+                  // onChange={handleSelectChange}
                 />
               </div>
             )}
+            {fitlerOptions?.Author && (
+              <div className="flex flex-col gap-1">
+                <span className="text-base text-gray-dark font-normal">
+                  Автор
+                </span>
+                <Select
+                  options={fitlerOptions?.Author.map((item) => ({
+                    value: item.idAuthor,
+                    label: item.nameAuthor
+                      ? `${item.nameAuthor} ${item.surname} ${item.patronymic}`
+                      : item.entity,
+                  }))}
+                  // onChange={handleSelectChange}
+                />
+              </div>
+            )}
+            <div className="flex flex-col gap-1">
+              <span className="text-base text-gray-dark font-normal">Год</span>
+              <InputRange className="sm:w-64" />
+            </div>
           </div>
         </Collapse>
       </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-10">
         {filteredBooks?.length ? (
           filteredBooks?.map((item, index) => (
             <div

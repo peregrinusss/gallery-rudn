@@ -4,8 +4,8 @@ import Input from "@/components/Input/Input";
 import MultiSelect from "@/components/MultiSelect/MultiSelect";
 import Select from "@/components/Select/Select";
 import {
+  addBookArg,
   AuthorArg,
-  AuthorResponse,
   useAddAuthorMutation,
   useAddBookMutation,
   useAddCityMutation,
@@ -25,7 +25,8 @@ import {
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { enqueueSnackbar } from "notistack";
-import React, { use, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Controller, useForm } from "react-hook-form";
 import { IoClose } from "react-icons/io5";
 
 // Страница авторизации
@@ -182,30 +183,35 @@ const Page = () => {
   const { data: authors } = useGetAuthorsQuery({});
 
   // создание книги
+  const { control, handleSubmit } = useForm<addBookArg>();
   const [addBook] = useAddBookMutation();
-  const [bookName, setBookName] = useState("");
-  const [bookYear, setBookYear] = useState("");
-  const [bookIdPublisher, setBookIdPublisher] = useState("");
-  const [bookDescription, setBookDescription] = useState("");
-  const [bookAddInfo, setBookAddInfo] = useState("");
-  const [bookIdCity, setBookIdCity] = useState("");
-  const [bookIdCountry, setBookIdCountry] = useState("");
-  const [bookIdsrf, setBookIdsrf] = useState("");
-  const [bookIdsAuthor, setBookIdsAuthor] = useState<number[]>([]);
+  // const [bookName, setBookName] = useState("");
+  // const [bookYear, setBookYear] = useState("");
+  // const [bookIdPublisher, setBookIdPublisher] = useState("");
+  // const [bookDescription, setBookDescription] = useState("");
+  // const [bookAddInfo, setBookAddInfo] = useState("");
+  // const [bookIdCity, setBookIdCity] = useState("");
+  // const [bookIdCountry, setBookIdCountry] = useState("");
+  // const [bookIdsrf, setBookIdsrf] = useState("");
+  // const [bookIdsAuthor, setBookIdsAuthor] = useState<number[]>([]);
   const [bookImages, setBookImages] = useState<File[]>([]);
   const [base64Images, setBase64Images] = useState<string[]>([]);
-  const handleAddBook = async () => {
+  const handleAddBook = async (data: addBookArg) => {
+    console.log(data);
+    console.log(bookImages);
+    console.log(base64Images);
+
     try {
       const res = await addBook({
-        name: bookName,
-        year: bookYear,
-        idPublisher: bookIdPublisher,
-        description: bookDescription,
-        addInfo: bookAddInfo,
-        idCity: bookIdCity,
-        idCountry: bookIdCountry,
-        idSRF: bookIdsrf,
-        Author: bookIdsAuthor,
+        name: data.name,
+        year: data.year,
+        idPublisher: data.idPublisher,
+        description: data.description,
+        addInfo: data.addInfo,
+        idCity: data.idCity,
+        idCountry: data.idCountry,
+        idSRF: data.idSRF,
+        Author: data.Author,
         Imgs: base64Images,
       }).unwrap();
       enqueueSnackbar("Книга успешно добавлена", { variant: "success" });
@@ -399,7 +405,6 @@ const Page = () => {
           Добавить издательство
         </Button>
       </div>
-
       <div className="border-t border-gray mt-2 pt-4 flex flex-col gap-3">
         <h2 className="text-2xl text-black font-bold">Добавление округа</h2>
         <Input
@@ -417,7 +422,6 @@ const Page = () => {
           Добавить округ
         </Button>
       </div>
-
       <div className="border-t border-gray mt-2 pt-4 flex flex-col gap-3">
         <h2 className="text-2xl text-black font-bold">Добавление субъекта</h2>
         <div className="flex flex-col gap-1">
@@ -449,101 +453,181 @@ const Page = () => {
       </div>
       <div className="border-t border-gray mt-2 pt-4 flex flex-col gap-3">
         <h2 className="text-2xl text-black font-bold">Создание книги</h2>
-        <Input
-          value={bookName}
-          onChange={(e) => setBookName(e.target.value)}
-          label="Название"
-          placeholder="Введите название книги"
-          type="text"
-          className="flex flex-col gap-1"
+        <Controller
+          control={control}
+          name="name"
+          rules={{ required: "Заполните поле" }}
+          render={({ field, fieldState }) => (
+            <Input
+              {...field}
+              error={fieldState.error}
+              // value={bookName}
+              // onChange={(e) => setBookName(e.target.value)}
+              label="Название"
+              placeholder="Введите название книги"
+              type="text"
+              className="flex flex-col gap-1"
+            />
+          )}
         />
-        <Input
-          value={bookYear}
-          onChange={(e) => setBookYear(e.target.value)}
-          label="Год выпуска"
-          placeholder="Введите год выпуска"
-          type="text"
-          className="flex flex-col gap-1"
+        <Controller
+          control={control}
+          name="year"
+          rules={{ required: "Заполните поле" }}
+          render={({ field, fieldState }) => (
+            <Input
+              {...field}
+              error={fieldState.error}
+              // value={bookYear}
+              // onChange={(e) => setBookYear(e.target.value)}
+              label="Год выпуска"
+              placeholder="Введите год выпуска"
+              type="text"
+              className="flex flex-col gap-1"
+            />
+          )}
         />
-        <Input
-          value={bookDescription}
-          onChange={(e) => setBookDescription(e.target.value)}
-          label="Описание"
-          placeholder="Введите описание"
-          type="text"
-          className="flex flex-col gap-1"
+        <Controller
+          control={control}
+          name="description"
+          rules={{ required: "Заполните поле" }}
+          render={({ field, fieldState }) => (
+            <Input
+              {...field}
+              error={fieldState.error}
+              // value={bookDescription}
+              // onChange={(e) => setBookDescription(e.target.value)}
+              label="Описание"
+              placeholder="Введите описание"
+              type="text"
+              className="flex flex-col gap-1"
+            />
+          )}
         />
-        <Input
-          value={bookAddInfo}
-          onChange={(e) => setBookAddInfo(e.target.value)}
-          label="Доп. информация"
-          placeholder="Введите доп. информацию"
-          type="text"
-          className="flex flex-col gap-1"
+        <Controller
+          control={control}
+          name="addInfo"
+          rules={{ required: "Заполните поле" }}
+          render={({ field, fieldState }) => (
+            <Input
+              {...field}
+              error={fieldState.error}
+              // value={bookAddInfo}
+              // onChange={(e) => setBookAddInfo(e.target.value)}
+              label="Доп. информация"
+              placeholder="Введите доп. информацию"
+              type="text"
+              className="flex flex-col gap-1"
+            />
+          )}
         />
         <div className="flex flex-col gap-1">
           <span className="block text-base text-black font-normal mb-1">
             Город
           </span>
-          <Select
-            options={(cities?.City || [])?.map((item) => ({
-              value: item.idCity,
-              label: item.city,
-            }))}
-            onChange={(e: any) => setBookIdCity(e.value)}
+          <Controller
+            control={control}
+            name="idCity"
+            render={({ field: { value, onChange } }) => (
+              <Select
+                options={(cities?.City || [])?.map((item) => ({
+                  value: item.idCity,
+                  label: item.city,
+                }))}
+                // onChange={(e: any) => setBookIdCity(e.value)}
+                onChange={onChange}
+                value={value!}
+              />
+            )}
           />
         </div>
         <div className="flex flex-col gap-1">
           <span className="block text-base text-black font-normal mb-1">
             Издательство
           </span>
-          <Select
-            options={(publishers?.Publisher || [])?.map((item) => ({
-              value: item.idPublisher,
-              label: item.publisher,
-            }))}
-            onChange={(e: any) => setBookIdPublisher(e.value)}
+          <Controller
+            control={control}
+            name="idPublisher"
+            rules={{ required: "Заполните поле" }}
+            render={({ field, fieldState }) => (
+              <Select
+                options={(publishers?.Publisher || [])?.map((item) => ({
+                  value: item.idPublisher,
+                  label: item.publisher,
+                }))}
+                // onChange={(e: any) => setBookIdPublisher(e.value)}
+                {...field}
+                error={fieldState.error}
+              />
+            )}
           />
         </div>
         <div className="flex flex-col gap-1">
           <span className="block text-base text-black font-normal mb-1">
             Страна
           </span>
-          <Select
-            options={(countries?.Country || [])?.map((item) => ({
-              value: item.idCountry,
-              label: item.country,
-            }))}
-            onChange={(e: any) => setBookIdPublisher(e.value)}
+          <Controller
+            control={control}
+            name="idCountry"
+            rules={{ required: "Заполните поле" }}
+            render={({ field, fieldState }) => (
+              <Select
+                options={(countries?.Country || [])?.map((item) => ({
+                  value: item.idCountry,
+                  label: item.country,
+                }))}
+                // onChange={(e: any) => setBookIdPublisher(e.value)}
+                {...field}
+                error={fieldState.error}
+              />
+            )}
           />
         </div>
         <div className="flex flex-col gap-1">
           <span className="block text-base text-black font-normal mb-1">
             Субъект РФ
           </span>
-          <Select
-            options={(subrfs?.SubjectRF || [])?.map((item) => ({
-              value: item.idSubjectRF,
-              label: item.subjectRF,
-            }))}
-            onChange={(e: any) => setBookIdsrf(e.value)}
+          <Controller
+            control={control}
+            name="idSRF"
+            render={({ field: { value, onChange } }) => (
+              <Select
+                options={(subrfs?.SubjectRF || [])?.map((item) => ({
+                  value: item.idSubjectRF,
+                  label: item.subjectRF,
+                }))}
+                // onChange={(e: any) => setBookIdsrf(e.value)}
+                onChange={onChange}
+                value={value!}
+              />
+            )}
           />
         </div>
         <div className="flex flex-col gap-1">
           <span className="block text-base text-black font-normal mb-1">
             Авторы
           </span>
-          <MultiSelect
-            options={(authors?.Author || [])?.map((item) => ({
-              value: item.idAuthor,
-              label:
-                item.entity !== null
-                  ? item.entity
-                  : item.name + " " + item.surname + " " + item.patronymic,
-            }))}
-            onChange={(selectedOptions) => {
-              setBookIdsAuthor(selectedOptions.map((option) => +option.value));
-            }}
+          <Controller
+            control={control}
+            name="idSRF"
+            render={({ field: { value, onChange } }) => (
+              <MultiSelect
+                options={(authors?.Author || [])?.map((item) => ({
+                  value: item.idAuthor,
+                  label:
+                    item.entity !== null
+                      ? item.entity
+                      : item.name + " " + item.surname + " " + item.patronymic,
+                }))}
+                // onChange={(selectedOptions) => {
+                //   setBookIdsAuthor(
+                //     selectedOptions.map((option) => +option.value)
+                //   );
+                // }}
+                onChange={onChange}
+                value={value!}
+              />
+            )}
           />
         </div>
         <div className="flex flex-col gap-1">
@@ -556,6 +640,7 @@ const Page = () => {
               type="file"
               multiple
               onChange={handleFileChange}
+              accept="image/*"
               className="block text-sm text-gray-900 border border-gray-300 cursor-pointer bg-gray-50 focus:outline-none w-full h-full opacity-0 absolute"
             />
             <label
@@ -590,7 +675,7 @@ const Page = () => {
           </div>
         )}
         <Button
-          onClick={handleAddBook}
+          onClick={handleSubmit(handleAddBook)}
           variant="primary"
           className="ml-auto xs:!w-fit !px-5"
         >

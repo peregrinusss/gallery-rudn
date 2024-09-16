@@ -34,7 +34,7 @@ type fdResponse = {
   }[];
 };
 
-type addBookArg = {
+export type addBookArg = {
   name: string;
   year: string;
   idPublisher: string;

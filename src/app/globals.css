@@ -150,3 +150,26 @@ input[type="search"]::-webkit-search-results-decoration {
 .notistack-SnackbarContainer {
   left: 0 !important;
 }
+
+.horizontal-slider {
+  width: 100%;
+  height: 10px;
+}
+
+.example-thumb {
+  height: 20px;
+  width: 20px;
+  background-color: #0070f3;
+  cursor: grab;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  top: -7px;
+}
+
+.example-track {
+  background: #ddd;
+  height: 5px;
+}

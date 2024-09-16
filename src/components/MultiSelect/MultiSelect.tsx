@@ -1,14 +1,16 @@
-import React, { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect, InputHTMLAttributes } from "react";
 
 type Option = {
   value: string;
   label: string;
 };
 
+type SelectAttributes = InputHTMLAttributes<HTMLInputElement>;
+
 type CustomSelectProps = {
   options: Option[];
   onChange?: (selectedOptions: Option[]) => void;
-};
+} & SelectAttributes;
 
 const MultiSelect: React.FC<CustomSelectProps> = ({ options, onChange }) => {
   const [isOpen, setIsOpen] = useState(false);
@@ -46,41 +48,40 @@ const MultiSelect: React.FC<CustomSelectProps> = ({ options, onChange }) => {
   return (
     <div className="relative inline-block w-full sm:w-64" ref={inputRef}>
       <div
-        className="h-[37px] bg-white border border-gray rounded-[20px] shadow-sm p-4 py-2 pr-10 text-left cursor-pointer focus:outline-none sm:text-sm"
+        className="bg-white border border-gray rounded-full shadow-sm px-5 py-[11px] pr-10 text-left cursor-pointer focus:outline-none sm:text-sm"
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="block truncate text-black">
           {selectedOptions.map((option) => option.label).join(", ") ||
             "Выбрать"}
         </span>
-        <span className="absolute inset-y-0 right-0 flex items-center pr-2 pointer-events-none text-black">
+        <div className={`absolute inset-y-0 right-4 flex items-center pointer-events-none text-black transition-all ${isOpen ? "rotate-180" : ""}`}>
           <svg
-            className="h-5 w-5 text-gray-400"
+            width="24"
+            height="24"
+            viewBox="0 0 24 24"
+            fill="none"
             xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 20 20"
-            fill="currentColor"
-            aria-hidden="true"
           >
             <path
-              fillRule="evenodd"
-              d="M5.23 7.21a.75.75 0 011.06.02L10 10.96l3.71-3.73a.75.75 0 011.06-.02.75.75 0 01-.02 1.06l-4 4a.75.75 0 01-1.06 0l-4-4a.75.75 0 01.02-1.06z"
-              clipRule="evenodd"
-            />
+              d="M12 15.5C11.7374 15.5005 11.4772 15.449 11.2346 15.3486C10.9919 15.2482 10.7715 15.1009 10.586 14.915L5.29297 9.62102L6.70697 8.20702L12 13.5L17.293 8.20702L18.707 9.62102L13.414 14.914C13.2285 15.1001 13.0081 15.2476 12.7655 15.3482C12.5228 15.4487 12.2626 15.5003 12 15.5Z"
+              fill="#030631"
+            ></path>
           </svg>
-        </span>
+        </div>
       </div>
       {isOpen && (
-        <div className="absolute z-40 mt-1 w-full bg-white shadow-lg max-h-60 rounded-md py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto focus:outline-none sm:text-sm">
+        <div className="absolute z-40 mt-1 w-full bg-white shadow-lg max-h-60 rounded-[16px] py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto scrollbar-thin scrollbar-thumb-primary scrollbar-track-transparent focus:outline-none sm:text-sm">
           {options.map((option) => (
             <div
               key={option.value}
-              className="cursor-pointer select-none relative py-2 pl-3 pr-9 hover:bg-gray-200"
+              className="cursor-pointer select-none relative py-2 pl-4 pr-9 hover:bg-indigo-600 hover:*:text-primary"
               onClick={() => handleOptionClick(option)}
             >
               <span
-                className={`block truncate ${
+                className={`block truncate transition-all ${
                   selectedOptions.some((o) => o.value === option.value)
-                    ? "font-semibold text-primary"
+                    ? "font-medium text-primary"
                     : "font-normal text-black"
                 }`}
               >
