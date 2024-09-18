@@ -185,15 +185,6 @@ const Page = () => {
   // создание книги
   const { control, handleSubmit } = useForm<addBookArg>();
   const [addBook] = useAddBookMutation();
-  // const [bookName, setBookName] = useState("");
-  // const [bookYear, setBookYear] = useState("");
-  // const [bookIdPublisher, setBookIdPublisher] = useState("");
-  // const [bookDescription, setBookDescription] = useState("");
-  // const [bookAddInfo, setBookAddInfo] = useState("");
-  // const [bookIdCity, setBookIdCity] = useState("");
-  // const [bookIdCountry, setBookIdCountry] = useState("");
-  // const [bookIdsrf, setBookIdsrf] = useState("");
-  // const [bookIdsAuthor, setBookIdsAuthor] = useState<number[]>([]);
   const [bookImages, setBookImages] = useState<File[]>([]);
   const [base64Images, setBase64Images] = useState<string[]>([]);
   const handleAddBook = async (data: addBookArg) => {
@@ -205,14 +196,15 @@ const Page = () => {
       const res = await addBook({
         name: data.name,
         year: data.year,
-        idPublisher: data.idPublisher,
+        idPublisher: +data.idPublisher,
         description: data.description,
         addInfo: data.addInfo,
-        idCity: data.idCity,
-        idCountry: data.idCountry,
-        idSRF: data.idSRF,
-        Author: data.Author,
-        Imgs: base64Images,
+        idCity: +data.idCity!,
+        idCountry: +data.idCountry,
+        idSRF: +data.idSRF!,
+        // @ts-ignore
+        Author: data.Author.map((a) => +a.value),
+        // Imgs: base64Images,
       }).unwrap();
       enqueueSnackbar("Книга успешно добавлена", { variant: "success" });
     } catch (e) {
@@ -528,15 +520,14 @@ const Page = () => {
           <Controller
             control={control}
             name="idCity"
-            render={({ field: { value, onChange } }) => (
+            render={(inputField) => (
               <Select
                 options={(cities?.City || [])?.map((item) => ({
                   value: item.idCity,
                   label: item.city,
                 }))}
                 // onChange={(e: any) => setBookIdCity(e.value)}
-                onChange={onChange}
-                value={value!}
+                {...inputField}
               />
             )}
           />
@@ -556,7 +547,7 @@ const Page = () => {
                   label: item.publisher,
                 }))}
                 // onChange={(e: any) => setBookIdPublisher(e.value)}
-                {...field}
+                field={field}
                 error={fieldState.error}
               />
             )}
@@ -577,7 +568,7 @@ const Page = () => {
                   label: item.country,
                 }))}
                 // onChange={(e: any) => setBookIdPublisher(e.value)}
-                {...field}
+                field={field}
                 error={fieldState.error}
               />
             )}
@@ -590,15 +581,16 @@ const Page = () => {
           <Controller
             control={control}
             name="idSRF"
-            render={({ field: { value, onChange } }) => (
+            render={(inputField) => (
               <Select
                 options={(subrfs?.SubjectRF || [])?.map((item) => ({
                   value: item.idSubjectRF,
                   label: item.subjectRF,
                 }))}
                 // onChange={(e: any) => setBookIdsrf(e.value)}
-                onChange={onChange}
-                value={value!}
+                {...inputField}
+                // onChange={onChange}
+                // value={value!}
               />
             )}
           />
@@ -609,7 +601,7 @@ const Page = () => {
           </span>
           <Controller
             control={control}
-            name="idSRF"
+            name="Author"
             render={({ field: { value, onChange } }) => (
               <MultiSelect
                 options={(authors?.Author || [])?.map((item) => ({
@@ -625,7 +617,8 @@ const Page = () => {
                 //   );
                 // }}
                 onChange={onChange}
-                value={value!}
+                // @ts-ignore
+                value={value}
               />
             )}
           />

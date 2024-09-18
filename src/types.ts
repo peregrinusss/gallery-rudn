@@ -1,5 +1,5 @@
 export type Books = {
-  Records: Book[];
+  Books: Book[];
 };
 
 export type Book = {

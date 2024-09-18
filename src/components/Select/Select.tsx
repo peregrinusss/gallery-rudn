@@ -4,7 +4,11 @@ import React, {
   useRef,
   useState,
 } from "react";
-import { ControllerFieldState, ControllerRenderProps, FieldError } from "react-hook-form";
+import {
+  ControllerFieldState,
+  ControllerRenderProps,
+  FieldError,
+} from "react-hook-form";
 import ErrorText from "../ErrorText";
 
 export type Option = {
@@ -127,9 +131,8 @@ const Select: React.FC<CustomSelectProps> = ({
             ))}
           </div>
         )}
-         <ErrorText error={error} />
+        <ErrorText error={error} />
       </div>
-     
     </>
   );
 };

@@ -30,14 +30,14 @@ const Page: FC = () => {
   const router = useRouter();
 
   // Получения каталога книг с апи
-  const { data: booksData, isLoading, error } = useGetBooksQuery({});
+  const { data: booksData, isLoading, error } = useGetBooksQuery({}); 
 
   const { data: fitlerOptions } = useGetFilterOptionsQuery({});
   const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
 
   useEffect(() => {
-    if (booksData && booksData.Records) {
-      setFilteredBooks(booksData.Records);
+    if (booksData && booksData.Books) {
+      setFilteredBooks(booksData.Books);
     }
   }, [booksData]);
 
@@ -49,11 +49,9 @@ const Page: FC = () => {
     setQ(value);
   };
 
-  const handleSelectChange = (selectedOption: Option) => {
+  const handleSelectChange = (selectedOption: Option) => {};
 
-  };
-
-  // Состояние раскрвтия фильтров
+  // Состояние раскрытия фильтров
   const [open, setOpen] = useState<boolean>(false);
 
   const toggleOpen = () => {
@@ -67,8 +65,8 @@ const Page: FC = () => {
 
   // Обработка поискового запроса
   useEffect(() => {
-    if (booksData && booksData.Records) {
-      const filtered = booksData.Records.filter((book) => {
+    if (booksData && booksData.Books) {
+      const filtered = booksData.Books.filter((book) => {
         // Замена null значения на "Неизвестная книга"
         const bookName = book.name || "Неизвестная книга";
         return q ? bookName.toLowerCase().includes(q.toLowerCase()) : true;

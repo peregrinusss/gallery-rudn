@@ -37,14 +37,14 @@ type fdResponse = {
 export type addBookArg = {
   name: string;
   year: string;
-  idPublisher: string;
+  idPublisher: number;
   description: string;
   addInfo: string;
-  idCity: string | null;
-  idCountry: string;
-  idSRF: string | null;
+  idCity: number | null;
+  idCountry: number;
+  idSRF: number | null;
   Author: number[];
-  Imgs: string[] | null;
+  // Imgs: string[] | null;
 };
 
 type citiesResponse = {
