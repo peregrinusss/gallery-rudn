@@ -96,11 +96,13 @@ export const apiSlice = createApi({
   //   baseUrl: "/api/RUDN_Gallery/php/", // Используем прокси
   // }),
   endpoints: (builder) => ({
-    getBooks: builder.query<Books, {}>({
-      query: (params) => ({
+    getBooks: builder.query<Books, {query?: string}>({
+      query: (queryArg) => ({
         url: "interface/catalog.php",
         method: "GET",
-        params,
+        params: {
+          query: queryArg.query,
+        },
       }),
     }),
     getFilterOptions: builder.query<FilterOptions, {}>({
@@ -222,11 +224,18 @@ export const apiSlice = createApi({
         body,
       }),
     }),
-    addBook: builder.mutation<{}, addBookArg>({
-      query: (body) => ({
+    addBook: builder.mutation({
+      query: (formData) => ({
         url: "function/addDataDB/addBibD.php",
         method: "POST",
-        body,
+        body: formData,
+      }),
+    }),
+    updateBook: builder.mutation({
+      query: (formData) => ({
+        url: "function/addDataDB/updateBibD.php",
+        method: "PATCH",
+        body: formData,
       }),
     }),
   }),
@@ -252,4 +261,5 @@ export const {
   useGetPublishersQuery,
   useGetCountriesQuery,
   useGetSubrfQuery,
+  useUpdateBookMutation,
 } = apiSlice;

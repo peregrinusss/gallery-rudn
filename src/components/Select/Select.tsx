@@ -1,56 +1,35 @@
-import React, {
-  SelectHTMLAttributes,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
-import {
-  ControllerFieldState,
-  ControllerRenderProps,
-  FieldError,
-} from "react-hook-form";
+import React, { useEffect, useRef, useState } from "react";
+import { FieldError } from "react-hook-form";
 import ErrorText from "../ErrorText";
 
 export type Option = {
-  value: string;
+  value: string | number;
   label: string;
 };
 
-type SelectAttributes = SelectHTMLAttributes<HTMLSelectElement>;
-
 type CustomSelectProps = {
   options: Option[];
-  onChange?: (selectedOption: Option) => void;
-  field?: ControllerRenderProps<any, any>;
-  fieldState?: ControllerFieldState;
+  value?: string | number;
+  onChange?: (value: string | number) => void;
   error?: FieldError | undefined;
-} & SelectAttributes;
+};
 
 const Select: React.FC<CustomSelectProps> = ({
   options,
+  value,
   onChange,
-  field,
   error,
-  fieldState,
-  ...rest
 }) => {
-  // Состояния для управления открытием выпадающего списка
+  console.log(value);
+  
+
+  // State to manage the open/close of dropdown
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  // Состояние для выбора элемента выпадающего списка
-  const [selectedOption, setSelectedOption] = useState<Option | null>(null);
-
-  // Ссылка на DOM-элемент выпадающего списка
+  // Ref to the dropdown DOM element
   const inputRef = useRef<HTMLDivElement>(null);
 
-  // Обработчик клика по элементу выпадающего списка
-  const handleOptionClick = (option: Option) => {
-    setSelectedOption(option);
-    setIsOpen(false);
-    if (onChange) onChange(option);
-  };
-
-  // Обработчик клика вне выпадающего списка для его закрытия
+  // Close the dropdown when clicking outside
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -61,14 +40,20 @@ const Select: React.FC<CustomSelectProps> = ({
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () => document.removeEventListener("mousedown", handleClickOutside);
+    return () =>
+      document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // Get the selected option based on the value prop
+  const selectedOption = options.find((option) => +option.value === +value!);
 
   return (
     <>
       <div className="relative inline-block w-full sm:w-64" ref={inputRef}>
         <div
-          className="bg-white border border-gray rounded-full shadow-sm px-5 py-[11px] pr-10 text-left cursor-pointer focus:outline-none sm:text-sm"
+          className={`bg-white border ${
+            error ? "border-red-500" : "border-gray"
+          } rounded-full shadow-sm px-5 py-[11px] pr-10 text-left cursor-pointer focus:outline-none sm:text-sm`}
           onClick={() => setIsOpen(!isOpen)}
         >
           <span className="block truncate text-black text-sm">
@@ -79,6 +64,7 @@ const Select: React.FC<CustomSelectProps> = ({
               isOpen ? "rotate-180" : ""
             }`}
           >
+            {/* SVG icon */}
             <svg
               width="24"
               height="24"
@@ -99,18 +85,21 @@ const Select: React.FC<CustomSelectProps> = ({
               <div
                 key={option.value}
                 className="cursor-pointer select-none relative py-2 pl-4 pr-9 hover:bg-indigo-600 hover:*:text-primary"
-                onClick={() => handleOptionClick(option)}
+                onClick={() => {
+                  setIsOpen(false);
+                  if (onChange) onChange(option.value);
+                }}
               >
                 <span
                   className={`block truncate transition-all ${
-                    selectedOption?.value === option.value
+                    value === option.value
                       ? "font-medium text-primary"
                       : "font-normal text-black"
                   }`}
                 >
                   {option.label}
                 </span>
-                {selectedOption?.value === option.value && (
+                {value === option.value && (
                   <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-primary">
                     <svg
                       className="h-5 w-5"

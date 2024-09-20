@@ -9,7 +9,7 @@ type SelectAttributes = InputHTMLAttributes<HTMLInputElement>;
 
 type CustomSelectProps = {
   options: Option[];
-  onChange?: (selectedOptions: Option[]) => void;
+  onChange?: (selectedValues: string[]) => void; // Change onChange to return array of `value` (strings)
 } & SelectAttributes;
 
 const MultiSelect: React.FC<CustomSelectProps> = ({ options, onChange }) => {
@@ -17,25 +17,27 @@ const MultiSelect: React.FC<CustomSelectProps> = ({ options, onChange }) => {
   const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   const inputRef = useRef<HTMLDivElement>(null);
 
-  // Добавление или удаление опции из выбранных
+  // Add or remove options from selectedOptions array
   const handleOptionClick = (option: Option) => {
     const alreadySelected = selectedOptions.some(
-      (o) => o.value === option.value
+      (o) => +o.value === +option.value
     );
     const newSelectedOptions = alreadySelected
       ? selectedOptions.filter((o) => o.value !== option.value)
       : [...selectedOptions, option];
+    
     setSelectedOptions(newSelectedOptions);
-    if (onChange) onChange(newSelectedOptions);
+
+    // Pass an array of `value` to onChange
+    if (onChange) {
+      onChange(newSelectedOptions.map((o) => o.value));
+    }
   };
 
-  // Закрытие списка при клике вне элемента
+  // Close dropdown when clicking outside of the component
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (
-        inputRef.current &&
-        !inputRef.current.contains(event.target as Node)
-      ) {
+      if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
         setIsOpen(false);
       }
     };

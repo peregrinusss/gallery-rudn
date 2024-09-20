@@ -4,26 +4,16 @@ import InputRange from "@/components/InputRange/InputRange";
 import Search from "@/components/Search/Search";
 import Select, { Option } from "@/components/Select/Select";
 import {
-  useFilterCatalogMutation,
   useGetBooksQuery,
   useGetFilterOptionsQuery,
 } from "@/redux/app/apiSlice";
-import { Book, Books } from "@/types";
-import { imagePath } from "@/utils/utils";
-import {
-  parseAsString,
-  ParserBuilder,
-  useQueryState,
-  useQueryStates,
-} from "next-usequerystate";
-import Image from "next/image";
+import { Book } from "@/types";
+import { useQueryState } from "next-usequerystate";
 import { useRouter } from "next/navigation";
-import { ChangeEvent, FC, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Collapse } from "react-collapse";
-import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
-// Страница авторизации
-const Page: FC = () => {
+const Page = () => {
   const [q, setQ] = useQueryState("q");
 
   // Переменная для роутинга
@@ -81,37 +71,12 @@ const Page: FC = () => {
 
   return (
     <div className="">
-      <div className="relative rounded-[20px]">
-        {/* <div className="absolute z-20 w-full h-full left-0 top-0 bg-gradient-to-r from-black to-transparent"></div> */}
-        <div className="flex flex-col gap-4 relative z-30">
-          <h2 className="text-5xl text-black font-semibold font-Agora">
-            <span className="text-primary">Мир и РУДН:</span> коллекция книг
-          </h2>
-          <div className="flex flex-col gap-1">
-            <span className="text-base md:text-lg text-black font-normal">
-              Книги о странах, городах, объектах культурного наследия
-            </span>
-            <span className="text-base md:text-lg text-black font-normal">
-              Смотрите и читайте печатные издания в научной библиотеке, главное
-              здание РУДН
-            </span>
-          </div>
-          <div className="mt-4">
-            <Search
-              setValue={handleSearchTasks}
-              value={q ?? ""}
-              placeholder="Поиск"
-            />
-          </div>
-        </div>
-        {/* <div className="absolute left-0 top-0 w-full h-full z-10">
-          <Image
-            alt="book-preview"
-            src={imagePath("/preview.jpeg")}
-            fill
-            style={{ objectFit: "cover" }}
-          />
-        </div> */}
+      <div className="flex flex-col gap-4 relative z-30">
+        <Search
+          setValue={handleSearchTasks}
+          value={q ?? ""}
+          placeholder="Поиск"
+        />
       </div>
       <div className="mt-14">
         <div
@@ -119,11 +84,6 @@ const Page: FC = () => {
           onClick={toggleOpen}
         >
           <span className="text-xl text-primary font-semibold">Фильтр</span>
-          {/* <MdOutlineKeyboardArrowDown
-            className={`text-black w-8 h-8 transition-all ${
-              open && "rotate-180"
-            }`}
-          /> */}
           <div className={`transition-all ${open && "rotate-180"}`}>
             <svg
               width="24"
@@ -239,7 +199,7 @@ const Page: FC = () => {
         {booksData?.Books?.length ? (
           booksData.Books?.map((item, index) => (
             <div
-              onClick={() => router.push(`catalog/${item.id}`)}
+              onClick={() => router.push(`book/${item.id}`)}
               key={item.id}
             >
               <BookPreview book={item} />

@@ -54,6 +54,8 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
                       </clipPath>
                     </defs>
                   </svg>
+                  <div className="w-[1px] h-[30px] bg-[#E9E9E9] hidden sm:block"></div>
+                  <div className="text-primary text-xl font-medium hidden sm:block">Научная библиотека</div>
                 </Link>
                 {/* <Image
                 alt="blur"
@@ -116,14 +118,14 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
 
       {/* Фон */}
       <div className="fixed w-full h-full left-0 top-0 -z-10 bg-gray">
-        {pathname.split("/").splice(-1)[0] === "signin" && (
+        {/* {pathname.split("/").splice(-1)[0] === "signin" && (
           <Image
             alt="background"
             src={imagePath("/bg.png")}
             fill
             style={{ objectFit: "cover" }}
           />
-        )}
+        )} */}
       </div>
     </>
   );

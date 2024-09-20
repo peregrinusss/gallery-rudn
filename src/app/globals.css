@@ -20,6 +20,7 @@
 
 body {
   /* color: rgb(var(--foreground-rgb)); */
+  color: #000 !important;
   scroll-behavior: smooth;
   text-rendering: optimizeSpeed;
   line-height: 1.5;
@@ -172,4 +173,20 @@ input[type="search"]::-webkit-search-results-decoration {
 .example-track {
   background: #ddd;
   height: 5px;
+}
+
+.react-tabs__tab--selected {
+  @apply bg-primary transition-all;
+}
+
+.react-tabs__tab--selected span {
+  @apply text-white transition-all;
+}
+
+.next-error-h1 {
+  display: none !important;
+}
+
+.next-error-h1 + div {
+  display: none !important;
 }

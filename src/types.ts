@@ -11,13 +11,17 @@ export type Book = {
 export type BookDetails = {
   id: string;
   name: string;
-  yaerPublisher: string;
+  yearPublisher: string;
   publisher: string;
+  idPublisher: number;
   description: string;
   addInformation: string;
   continent: string;
+  idCountinent: string;
   country: string;
+  idCountry: number;
   city: string;
+  idCity: number;
   Authors: {
     surname: string;
     name: string;

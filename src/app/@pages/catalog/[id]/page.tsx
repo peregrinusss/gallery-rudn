@@ -61,21 +61,20 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
                 className="text-base md:text-xl text-gray-dark font-normal"
               >
                 {author.name} {author.surname}
+                {book?.Authors.length - 1 !== index && ", "}
               </span>
             ))
           ) : (
-            <span className="text-base md:text-xl text-gray-dark font-normal">
-              Неизвестный автор
-            </span>
+           <></>
           )}
         </div>
       </div>
       <div className="flex flex-col-reverse xl:grid xl:grid-cols-2 mt-5 gap-3 xl:gap-10">
         <div className="w-full flex flex-col gap-2">
-          <p className="text-base text-black font-normal">
+          <p className="text-lg text-black font-normal">
             {book?.description}
           </p>
-          <p className="text-base text-black font-normal">
+          <p className="text-lg text-black font-normal">
             {book?.addInformation}
           </p>
         </div>
