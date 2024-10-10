@@ -1,5 +1,6 @@
 import { BookDetails, Books, FilterOptions } from "@/types";
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
+import baseQuery from "../fetchBaseQuery";
 
 type filterCatalogArg = {
   query: string;
@@ -86,16 +87,26 @@ export type AuthorResponse = {
   }[];
 };
 
+export type LoginArg = {
+  login: string;
+  password: string;
+};
+
 // Все запросы к апи
 export const apiSlice = createApi({
   reducerPath: "api",
-  baseQuery: fetchBaseQuery({
-    baseUrl: "http://95.165.168.235:65080/RUDN_Gallery/php/",
-  }),
+  baseQuery: baseQuery,
   // baseQuery: fetchBaseQuery({
   //   baseUrl: "/api/RUDN_Gallery/php/", // Используем прокси
   // }),
   endpoints: (builder) => ({
+    login: builder.mutation<{token: string}, LoginArg>({
+      query: (body) => ({
+        url: "interface/authorization.php",
+        method: "POST",
+        body,
+      }),
+    }),
     getBooks: builder.query<Books, {query?: string}>({
       query: (queryArg) => ({
         url: "interface/catalog.php",
@@ -242,6 +253,7 @@ export const apiSlice = createApi({
 });
 
 export const {
+  useLoginMutation,
   useGetBooksQuery,
   useGetFilterOptionsQuery,
   useGetBookByIdMutation,

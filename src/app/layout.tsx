@@ -57,7 +57,6 @@ const RootLayout: FC<Props> = ({ children, pages }) => {
       <body className={`${Agora.variable} ${Centro.variable}`}>
         <Providers>
           {pages}
-          {children}
         </Providers>
       </body>
     </html>
