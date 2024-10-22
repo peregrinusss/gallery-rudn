@@ -1,17 +1,16 @@
 "use client";
 import Image from "next/image";
 import React, { FC, useEffect, useState } from "react";
-import { Swiper, SwiperSlide } from "swiper/react";
-import { Navigation, Pagination, A11y } from "swiper/modules";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 
 // Импорт Swiper стилей
-import "swiper/css";
-import "swiper/css/pagination";
-import { BookDetails, CatalogPagesParams } from "@/types";
+import Button from "@/components/Button/Button";
+import Input from "@/components/Input/Input";
+import MultiSelect from "@/components/MultiSelect/MultiSelect";
+import Select from "@/components/Select/Select";
 import {
   addBookArg,
-  AuthorArg,
+  useDeleteBookMutation,
   useGetAuthorsQuery,
   useGetBookByIdMutation,
   useGetCitiesQuery,
@@ -20,15 +19,14 @@ import {
   useGetSubrfQuery,
   useUpdateBookMutation,
 } from "@/redux/app/apiSlice";
+import { BookDetails, CatalogPagesParams } from "@/types";
 import { createImageSrc } from "@/utils/utils";
 import { useRouter } from "next/navigation";
 import { enqueueSnackbar } from "notistack";
 import { Controller, useForm, useWatch } from "react-hook-form";
-import Input from "@/components/Input/Input";
-import Select from "@/components/Select/Select";
-import MultiSelect from "@/components/MultiSelect/MultiSelect";
-import Button from "@/components/Button/Button";
 import { IoClose } from "react-icons/io5";
+import "swiper/css";
+import "swiper/css/pagination";
 
 // Страница авторизации
 const Page: FC<CatalogPagesParams> = ({ params }) => {
@@ -41,6 +39,7 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
   // Получение книги с апи
   const [getBook] = useGetBookByIdMutation();
   const [book, setBook] = useState<BookDetails>();
+  const [deleteBook] = useDeleteBookMutation();
 
   useEffect(() => {
     const fetchBook = async () => {
@@ -113,6 +112,21 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
     }
   };
 
+  const handleDeleteBook = async () => {
+    const isConfirmed = window.confirm("Вы уверены, что хотите удалить книгу?");
+  
+    if (!isConfirmed) return;
+  
+    try {
+      const res = await deleteBook({idBibD: +bookId}).unwrap();
+  
+      enqueueSnackbar("Книга успешно удалена", { variant: "success" });
+      router.back();
+    } catch (e) {
+      enqueueSnackbar("К сожалению, что-то пошло не так", { variant: "error" });
+    }
+  };
+
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const files = event.target.files;
     if (files) {
@@ -164,7 +178,7 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
         <Controller
           control={control}
           name="year"
-          rules={{ required: "Заполните поле" }}
+          // rules={{ required: "Заполните поле" }}
           render={({ field, fieldState }) => (
             <Input
               {...field}
@@ -179,7 +193,7 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
         <Controller
           control={control}
           name="description"
-          rules={{ required: "Заполните поле" }}
+          // rules={{ required: "Заполните поле" }}
           render={({ field, fieldState }) => (
             <Input
               {...field}
@@ -194,7 +208,7 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
         <Controller
           control={control}
           name="addInfo"
-          rules={{ required: "Заполните поле" }}
+          // rules={{ required: "Заполните поле" }}
           render={({ field, fieldState }) => (
             <Input
               {...field}
@@ -390,13 +404,22 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
             </div>
           </div>
         )}
-        <Button
-          onClick={handleSubmit(handleAddBook)}
-          variant="primary"
-          className="ml-auto xs:!w-fit !px-5"
-        >
-          Обновить запись
-        </Button>
+        <div className="flex items-center gap-4 mt-4 w-fit ml-auto">
+          <Button
+            onClick={handleDeleteBook}
+            variant="danger"
+            className="ml-auto xs:!w-fit !px-5"
+          >
+            Удалить запись
+          </Button>
+          <Button
+            onClick={handleSubmit(handleAddBook)}
+            variant="primary"
+            className="ml-auto xs:!w-fit !px-5"
+          >
+            Обновить запись
+          </Button>
+        </div>
       </div>
     </div>
   );

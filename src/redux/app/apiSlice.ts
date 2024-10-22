@@ -102,7 +102,7 @@ export const apiSlice = createApi({
   endpoints: (builder) => ({
     login: builder.mutation<{token: string}, LoginArg>({
       query: (body) => ({
-        url: "interface/authorization.php",
+        url: "function/authorization/authorization.php",
         method: "POST",
         body,
       }),
@@ -244,9 +244,16 @@ export const apiSlice = createApi({
     }),
     updateBook: builder.mutation({
       query: (formData) => ({
-        url: "function/addDataDB/updateBibD.php",
-        method: "PATCH",
+        url: "function/updateDataDB/updateBibD.php",
+        method: "POST",
         body: formData,
+      }),
+    }),
+    deleteBook: builder.mutation<{}, {idBibD: number}>({
+      query: (body) => ({
+        url: "function/deleteDataDB/deleteBibD.php",
+        method: "POST",
+        body,
       }),
     }),
   }),
@@ -274,4 +281,5 @@ export const {
   useGetCountriesQuery,
   useGetSubrfQuery,
   useUpdateBookMutation,
+  useDeleteBookMutation,
 } = apiSlice;

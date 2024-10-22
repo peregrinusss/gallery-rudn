@@ -20,9 +20,6 @@ const Select: React.FC<CustomSelectProps> = ({
   onChange,
   error,
 }) => {
-  console.log(value);
-  
-
   // State to manage the open/close of dropdown
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
