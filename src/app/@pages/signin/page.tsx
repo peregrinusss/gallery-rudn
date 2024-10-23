@@ -4,6 +4,7 @@ import Input from "@/components/Input/Input";
 import useAuth from "@/hooks/useAuth";
 import { LoginArg, useLoginMutation } from "@/redux/app/apiSlice";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { Controller, useForm } from "react-hook-form";
 
 // Страница авторизации
@@ -11,6 +12,7 @@ const Page = () => {
   const { control, handleSubmit, reset } = useForm<LoginArg>();
   const [login] = useLoginMutation();
   const { setToken } = useAuth();
+  const router = useRouter();
 
   const onSubmit = async (data: LoginArg) => {
     try {
@@ -21,6 +23,7 @@ const Page = () => {
         setToken(result.token);
       }
 
+      router.push('/catalog')
       // Сброс формы после успешной авторизации
       reset();
     } catch (error) {
