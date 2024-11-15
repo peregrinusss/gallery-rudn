@@ -1,17 +1,21 @@
-import { useState } from 'react';
-import Cookies from 'js-cookie';
+import { useState, useEffect } from 'react';
 
-// Хук useAuth
 const useAuth = () => {
-  const [token, setAuthToken] = useState<string | null>(Cookies.get('token') || null);
+  const [token, setAuthToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    // Считываем токен из localStorage при загрузке
+    const storedToken = localStorage.getItem('token');
+    setAuthToken(storedToken);
+  }, []);
 
   const setToken = (newToken: string) => {
-    Cookies.set('token', newToken, { secure: true, sameSite: 'strict' });
+    localStorage.setItem('token', newToken); // Сохраняем токен в localStorage
     setAuthToken(newToken); // Обновляем локальное состояние токена
   };
 
   const clearToken = () => {
-    Cookies.remove('token');
+    localStorage.removeItem('token'); // Удаляем токен из localStorage
     setAuthToken(null); // Очищаем локальное состояние токена
   };
 

@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect, InputHTMLAttributes } from "react";
+import React, { InputHTMLAttributes, useEffect, useRef, useState } from "react";
 
 type Option = {
   value: string;
@@ -9,35 +9,37 @@ type SelectAttributes = InputHTMLAttributes<HTMLInputElement>;
 
 type CustomSelectProps = {
   options: Option[];
-  onChange?: (selectedValues: string[]) => void; // Change onChange to return array of `value` (strings)
+  value: string[];
+  onChange?: (selectedValues: string[]) => void;
 } & SelectAttributes;
 
-const MultiSelect: React.FC<CustomSelectProps> = ({ options, onChange }) => {
+const MultiSelect: React.FC<CustomSelectProps> = ({
+  options,
+  value = [],
+  onChange,
+}) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selectedOptions, setSelectedOptions] = useState<Option[]>([]);
   const inputRef = useRef<HTMLDivElement>(null);
 
-  // Add or remove options from selectedOptions array
+  // Выбор опций при клике
   const handleOptionClick = (option: Option) => {
-    const alreadySelected = selectedOptions.some(
-      (o) => +o.value === +option.value
-    );
-    const newSelectedOptions = alreadySelected
-      ? selectedOptions.filter((o) => o.value !== option.value)
-      : [...selectedOptions, option];
-    
-    setSelectedOptions(newSelectedOptions);
+    const alreadySelected = value.includes(option.value);
+    const newSelectedValues = alreadySelected
+      ? value.filter((v) => v !== option.value)
+      : [...value, option.value];
 
-    // Pass an array of `value` to onChange
     if (onChange) {
-      onChange(newSelectedOptions.map((o) => o.value));
+      onChange(newSelectedValues);
     }
   };
 
-  // Close dropdown when clicking outside of the component
+  // Закрыть меню при клике снаружи
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (inputRef.current && !inputRef.current.contains(event.target as Node)) {
+      if (
+        inputRef.current &&
+        !inputRef.current.contains(event.target as Node)
+      ) {
         setIsOpen(false);
       }
     };
@@ -54,10 +56,18 @@ const MultiSelect: React.FC<CustomSelectProps> = ({ options, onChange }) => {
         onClick={() => setIsOpen(!isOpen)}
       >
         <span className="block truncate text-black">
-          {selectedOptions.map((option) => option.label).join(", ") ||
-            "Выбрать"}
+          {value.length > 0
+            ? options
+                .filter((option) => value.includes(option.value))
+                .map((option) => option.label)
+                .join(", ")
+            : "Выбрать"}
         </span>
-        <div className={`absolute inset-y-0 right-4 flex items-center pointer-events-none text-black transition-all ${isOpen ? "rotate-180" : ""}`}>
+        <div
+          className={`absolute right-4 top-3 flex pointer-events-none text-black transition-all ${
+            isOpen ? "rotate-180" : ""
+          }`}
+        >
           <svg
             width="24"
             height="24"
@@ -82,14 +92,14 @@ const MultiSelect: React.FC<CustomSelectProps> = ({ options, onChange }) => {
             >
               <span
                 className={`block truncate transition-all ${
-                  selectedOptions.some((o) => o.value === option.value)
+                  value.includes(option.value)
                     ? "font-medium text-primary"
                     : "font-normal text-black"
                 }`}
               >
                 {option.label}
               </span>
-              {selectedOptions.some((o) => o.value === option.value) && (
+              {value.includes(option.value) && (
                 <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-primary">
                   <svg
                     className="h-5 w-5"

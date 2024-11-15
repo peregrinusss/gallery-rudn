@@ -1,6 +1,8 @@
 "use client";
+import AddBookForm from "@/components/AddBookForm/AddBookForm";
 import Button from "@/components/Button/Button";
 import Input from "@/components/Input/Input";
+import InputRange from "@/components/InputRange/InputRange";
 import MultiSelect from "@/components/MultiSelect/MultiSelect";
 import Select from "@/components/Select/Select";
 import {
@@ -47,6 +49,13 @@ const Page = () => {
   const [addContinent] = useAddContinentMutation();
   const [continent, setContinent] = useState("");
   const handleAddContinent = async () => {
+    if (!continent.trim()) {
+      enqueueSnackbar("Поле континента не может быть пустым", {
+        variant: "error",
+      });
+      return;
+    }
+
     try {
       const res = await addContinent({
         continent,
@@ -62,6 +71,11 @@ const Page = () => {
   const [addCity] = useAddCityMutation();
   const [city, setCity] = useState("");
   const handleAddCity = async () => {
+    if (!city.trim()) {
+      enqueueSnackbar("Поле города не может быть пустым", { variant: "error" });
+      return;
+    }
+
     try {
       const res = await addCity({
         city,
@@ -79,19 +93,28 @@ const Page = () => {
   const [country, setCountry] = useState("");
   const [idContinent, setIdContinent] = useState<number>(0);
   const handleAddCountry = async () => {
+    if (idContinent === 0) {
+      enqueueSnackbar("Выберите континент", { variant: "error" });
+      return;
+    }
+
+    if (idContinent && !country.trim()) {
+      enqueueSnackbar("Поле страны не может быть пустым", { variant: "error" });
+      return;
+    }
+
     try {
       const res = await addCountry({
         country,
         idContinent,
       }).unwrap();
       setCountry("");
+      setIdContinent(0);
       enqueueSnackbar("Страна успешно добавлена", { variant: "success" });
     } catch (e) {
-      idContinent === 0
-        ? enqueueSnackbar("Выберите континент", { variant: "error" })
-        : enqueueSnackbar("К сожалению, что-то пошло не так", {
-            variant: "error",
-          });
+      enqueueSnackbar("К сожалению, что-то пошло не так", {
+        variant: "error",
+      });
     }
   };
 
@@ -112,13 +135,32 @@ const Page = () => {
     }
   }, [isAuthor]);
   const handleAddAuthor = async () => {
+    if (isAuthor) {
+      if (!author.surname?.trim() || !author.name?.trim()) {
+        enqueueSnackbar("Фамилия и имя автора обязательны", {
+          variant: "error",
+        });
+        return;
+      }
+    } else {
+      if (!author.entity?.trim()) {
+        enqueueSnackbar("Название организации обязательно", {
+          variant: "error",
+        });
+        return;
+      }
+    }
+
     try {
-      const res = await addAuthor({
-        entity: author?.entity!,
-        name: author?.name!,
-        patronymic: author?.patronymic!,
-        surname: author?.surname!,
-      }).unwrap();
+      const authorData = author.entity
+        ? { entity: author.entity }
+        : {
+            surname: author.surname!,
+            name: author.name!,
+            ...(author.patronymic ? { patronymic: author.patronymic } : {}),
+          };
+
+      const res = await addAuthor(authorData).unwrap();
       setAuthor({ surname: null, name: null, patronymic: null, entity: null });
       enqueueSnackbar("Автор успешно добавлен", { variant: "success" });
     } catch (e) {
@@ -132,6 +174,13 @@ const Page = () => {
   const [addPublishing] = useAddPublishingMutation();
   const [publishing, setPublishing] = useState("");
   const handleAddPublishing = async () => {
+    if (!publishing.trim()) {
+      enqueueSnackbar("Поле издательства не может быть пустым", {
+        variant: "error",
+      });
+      return;
+    }
+
     try {
       const res = await addPublishing({
         publishing,
@@ -149,6 +198,13 @@ const Page = () => {
   const [addFd] = useAddFDMutation();
   const [fd, setFd] = useState("");
   const handleAddFD = async () => {
+    if (!fd.trim()) {
+      enqueueSnackbar("Поле федерального округа не может быть пустым", {
+        variant: "error",
+      });
+      return;
+    }
+
     try {
       const res = await addFd({
         fd,
@@ -168,102 +224,31 @@ const Page = () => {
   const [sRF, setSRF] = useState("");
   const [idFd, setIdFd] = useState<number>(0);
   const handleAddSubrf = async () => {
+    if (!idFd) {
+      enqueueSnackbar("Выберите федеральный округ", { variant: "error" });
+      return;
+    }
+
+    if (!sRF.trim()) {
+      enqueueSnackbar("Поле субъекта РФ не может быть пустым", {
+        variant: "error",
+      });
+      return;
+    }
+
     try {
       const res = await addSubrf({
         sRF,
         idFD: idFd,
       }).unwrap();
       setSRF("");
+      setIdFd(0);
       enqueueSnackbar("Субъект РФ успешно добавлен", { variant: "success" });
     } catch (e) {
-      idFd === 0
-        ? enqueueSnackbar("Выберите федеральный округ", { variant: "error" })
-        : enqueueSnackbar("К сожалению, что-то пошло не так", {
-            variant: "error",
-          });
-    }
-  };
-
-  const { data: cities } = useGetCitiesQuery({});
-  const { data: publishers } = useGetPublishersQuery({});
-  const { data: countries } = useGetCountriesQuery({});
-  const { data: subrfs } = useGetSubrfQuery({});
-  const { data: authors } = useGetAuthorsQuery({});
-
-  // создание книги
-  const { control, handleSubmit, reset } = useForm<addBookArg>();
-  const { idCountry } = useWatch({ control });
-  const [addBook] = useAddBookMutation();
-  const [bookImages, setBookImages] = useState<File[]>([]);
-  const [base64Images, setBase64Images] = useState<string[]>([]);
-  const handleAddBook = async (data: addBookArg) => {
-    // Преобразование объекта в строку JSON
-    const jsonData = JSON.stringify(data);
-
-    // Создание FormData
-    const formData = new FormData();
-
-    // Добавление JSON в FormData
-    formData.append("json", jsonData);
-
-    bookImages.forEach((file) => {
-      formData.append("images[]", file);
-    });
-
-    try {
-      const res = await addBook(formData).unwrap();
-
-      reset({
-        addInfo: "",
-        description: "",
-        idCity: 0,
-        idCountry: 0,
-        idPublisher: 0,
-        name: "",
-        year: "",
-        Author: [],
-        idSRF: 0,
+      enqueueSnackbar("К сожалению, что-то пошло не так", {
+        variant: "error",
       });
-      setBase64Images([]);
-      enqueueSnackbar("Книга успешно добавлена", { variant: "success" });
-    } catch (e) {
-      enqueueSnackbar("К сожалению, что-то пошло не так", { variant: "error" });
     }
-  };
-
-  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
-    const files = event.target.files;
-    if (files) {
-      const filesArray = Array.from(files);
-      setBookImages((prevImages) => [...prevImages, ...filesArray]);
-      convertFilesToBase64(filesArray);
-    }
-  };
-
-  const convertFilesToBase64 = (files: File[]) => {
-    const promises = files.map((file) => {
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = (error) => reject(error);
-      });
-    });
-
-    Promise.all(promises)
-      .then((results) =>
-        setBase64Images((prevBase64Images) => [...prevBase64Images, ...results])
-      )
-      .catch((error) =>
-        console.error("Error converting files to Base64:", error)
-      );
-  };
-
-  const handleRemoveImage = (index: number) => {
-    const updatedBookImages = bookImages.filter((_, i) => i !== index);
-    const updatedBase64Images = base64Images.filter((_, i) => i !== index);
-    setBookImages(updatedBookImages);
-    setBase64Images(updatedBase64Images);
   };
 
   return (
@@ -342,14 +327,14 @@ const Page = () => {
         <Collapse isOpened={openSection === "continent"}>
           <div className="flex flex-col gap-3">
             <Input
-              value={city}
-              onChange={(e) => setCity(e.target.value)}
+              value={continent}
+              onChange={(e) => setContinent(e.target.value)}
               label="Континент"
               placeholder="Введите континент"
               type="text"
             />
             <Button
-              onClick={handleAddCity}
+              onClick={handleAddContinent}
               variant="primary"
               className="ml-auto xs:!w-fit !px-5"
             >
@@ -660,224 +645,7 @@ const Page = () => {
       </div>
       <div className="border-t border-gray mt-2 pt-4 flex flex-col gap-3">
         <h2 className="text-2xl text-black font-bold">Создание книги</h2>
-        <Controller
-          control={control}
-          name="name"
-          rules={{ required: "Заполните поле" }}
-          render={({ field, fieldState }) => (
-            <Input
-              {...field}
-              error={fieldState.error}
-              label="Название"
-              placeholder="Введите название книги"
-              type="text"
-              className="flex flex-col gap-1"
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="year"
-          rules={{ required: "Заполните поле" }}
-          render={({ field, fieldState }) => (
-            <Input
-              {...field}
-              error={fieldState.error}
-              label="Год выпуска"
-              placeholder="Введите год выпуска"
-              type="text"
-              className="flex flex-col gap-1"
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="description"
-          rules={{ required: "Заполните поле" }}
-          render={({ field, fieldState }) => (
-            <Input
-              {...field}
-              error={fieldState.error}
-              label="Описание"
-              placeholder="Введите описание"
-              type="text"
-              className="flex flex-col gap-1"
-            />
-          )}
-        />
-        <Controller
-          control={control}
-          name="addInfo"
-          rules={{ required: "Заполните поле" }}
-          render={({ field, fieldState }) => (
-            <Input
-              {...field}
-              error={fieldState.error}
-              label="Доп. информация"
-              placeholder="Введите доп. информацию"
-              type="text"
-              className="flex flex-col gap-1"
-            />
-          )}
-        />
-        <div className="flex flex-col gap-1">
-          <span className="block text-base text-black font-normal mb-1">
-            Город
-          </span>
-          <Controller
-            control={control}
-            name="idCity"
-            render={({ field, fieldState }) => (
-              <Select
-                options={(cities?.City || [])?.map((item) => ({
-                  value: item.idCity,
-                  label: item.city,
-                }))}
-                value={field.value!}
-                onChange={field.onChange}
-                error={fieldState.error}
-              />
-            )}
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <span className="block text-base text-black font-normal mb-1">
-            Издательство
-          </span>
-          <Controller
-            control={control}
-            name="idPublisher"
-            rules={{ required: "Заполните поле" }}
-            render={({ field, fieldState }) => (
-              <Select
-                options={(publishers?.Publisher || [])?.map((item) => ({
-                  value: item.idPublisher,
-                  label: item.publisher,
-                }))}
-                value={field.value}
-                onChange={field.onChange}
-                error={fieldState.error}
-              />
-            )}
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <span className="block text-base text-black font-normal mb-1">
-            Страна
-          </span>
-          <Controller
-            control={control}
-            name="idCountry"
-            rules={{ required: "Заполните поле" }}
-            render={({ field, fieldState }) => (
-              <Select
-                options={(countries?.Country || [])?.map((item) => ({
-                  value: item.idCountry,
-                  label: item.country,
-                }))}
-                value={field.value}
-                onChange={field.onChange}
-                error={fieldState.error}
-              />
-            )}
-          />
-        </div>
-        {idCountry?.toString() === "6" && (
-          <div className="flex flex-col gap-1">
-            <span className="block text-base text-black font-normal mb-1">
-              Субъект РФ
-            </span>
-            <Controller
-              control={control}
-              name="idSRF"
-              render={({ field, fieldState }) => (
-                <Select
-                  options={(subrfs?.SubjectRF || [])?.map((item) => ({
-                    value: item.idSubjectRF,
-                    label: item.subjectRF,
-                  }))}
-                  value={field.value!}
-                  onChange={field.onChange}
-                  error={fieldState.error}
-                />
-              )}
-            />
-          </div>
-        )}
-
-        <div className="flex flex-col gap-1">
-          <span className="block text-base text-black font-normal mb-1">
-            Авторы
-          </span>
-          <Controller
-            control={control}
-            name="Author"
-            render={({ field: { value, onChange } }) => (
-              <MultiSelect
-                options={(authors?.Author || [])?.map((item) => ({
-                  value: item.idAuthor,
-                  label:
-                    item.entity !== null
-                      ? item.entity
-                      : item.name + " " + item.surname + " " + item.patronymic,
-                }))}
-                onChange={onChange}
-                value={+value}
-              />
-            )}
-          />
-        </div>
-        <div className="flex flex-col gap-1">
-          <span className="block text-base text-black font-normal mb-1">
-            Загрузить изображения
-          </span>
-          <div className="relative mt-2">
-            <input
-              id="file-upload"
-              type="file"
-              multiple
-              onChange={handleFileChange}
-              accept="image/*"
-              className="block text-sm text-gray-900 border border-gray-300 cursor-pointer bg-gray-50 focus:outline-none w-full h-full opacity-0 absolute"
-            />
-            <label
-              htmlFor="file-upload"
-              className="py-2 px-3 rounded-[20px] bg-primary cursor-pointer active:opacity-70 transition-all relative"
-            >
-              <span className="text-white text-sm font-medium">
-                Выбрать фото
-              </span>
-            </label>
-          </div>
-        </div>
-        {base64Images.length > 0 && (
-          <div className="flex items-center gap-5 flex-wrap">
-            {base64Images.map((image, index) => (
-              <div key={index} className="relative w-fit">
-                <Image
-                  src={image}
-                  width={500}
-                  height={500}
-                  alt={`preview ${index}`}
-                  className="w-40 h-40 object-cover rounded"
-                />
-                <button
-                  onClick={() => handleRemoveImage(index)}
-                  className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full p-1 bg-white shadow-xl"
-                >
-                  <IoClose className="w-6 h-6 text-black" />
-                </button>
-              </div>
-            ))}
-          </div>
-        )}
-        <Button
-          onClick={handleSubmit(handleAddBook)}
-          variant="primary"
-          className="ml-auto xs:!w-fit !px-5"
-        >
-          Создать книгу
-        </Button>
+        <AddBookForm />
       </div>
     </div>
   );

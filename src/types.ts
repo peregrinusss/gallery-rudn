@@ -20,15 +20,18 @@ export type BookDetails = {
   idCountinent: string;
   country: string;
   idCountry: number;
+  idSRF?: number;
   city: string;
   idCity: number;
   Authors: {
+    idAuthor: number;
     surname: string;
     name: string;
     patrymic: string;
-    organization: string;
+    entity: string;
   }[];
   Images: {
+    idImg: number;
     path: string;
   }[];
 };

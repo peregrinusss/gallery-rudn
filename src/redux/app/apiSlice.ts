@@ -21,10 +21,10 @@ type ContinentResponse = {
 };
 
 export type AuthorArg = {
-  surname: string | null;
-  name: string | null;
-  patronymic: string | null;
-  entity: string | null;
+  surname?: string | null;
+  name?: string | null;
+  patronymic?: string | null;
+  entity?: string | null;
 };
 
 type fdResponse = {
@@ -37,15 +37,15 @@ type fdResponse = {
 
 export type addBookArg = {
   name: string;
-  year: string;
-  idPublisher: number;
+  year: number;
+  idPublisher: number | null;
   description: string;
   addInfo: string;
   idCity: number | null;
-  idCountry: number;
+  idCountry: number | null;
   idSRF: number | null;
-  Author: number[];
-  // Imgs: string[] | null;
+  Author: string[];
+  // 'images[]': string[] | null;
 };
 
 type citiesResponse = {
@@ -100,14 +100,14 @@ export const apiSlice = createApi({
   //   baseUrl: "/api/RUDN_Gallery/php/", // Используем прокси
   // }),
   endpoints: (builder) => ({
-    login: builder.mutation<{token: string}, LoginArg>({
+    login: builder.mutation<{ token: string }, LoginArg>({
       query: (body) => ({
         url: "function/authorization/authorization.php",
         method: "POST",
         body,
       }),
     }),
-    getBooks: builder.query<Books, {query?: string}>({
+    getBooks: builder.query<Books, { query?: string }>({
       query: (queryArg) => ({
         url: "interface/catalog.php",
         method: "GET",
@@ -249,7 +249,7 @@ export const apiSlice = createApi({
         body: formData,
       }),
     }),
-    deleteBook: builder.mutation<{}, {idBibD: number}>({
+    deleteBook: builder.mutation<{}, { idBibD: number }>({
       query: (body) => ({
         url: "function/deleteDataDB/deleteBibD.php",
         method: "POST",

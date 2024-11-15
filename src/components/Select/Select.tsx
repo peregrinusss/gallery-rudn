@@ -9,7 +9,7 @@ export type Option = {
 
 type CustomSelectProps = {
   options: Option[];
-  value?: string | number;
+  value?: string | number | null;
   onChange?: (value: string | number) => void;
   error?: FieldError | undefined;
 };
@@ -20,13 +20,12 @@ const Select: React.FC<CustomSelectProps> = ({
   onChange,
   error,
 }) => {
-  // State to manage the open/close of dropdown
+  // Состояние для открытия/закрытия выпадающего меню
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
-  // Ref to the dropdown DOM element
   const inputRef = useRef<HTMLDivElement>(null);
 
-  // Close the dropdown when clicking outside
+  // Закрыть меню при клике снаружи
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (
@@ -37,11 +36,10 @@ const Select: React.FC<CustomSelectProps> = ({
       }
     };
     document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Get the selected option based on the value prop
+  // Получить отображаемую опцию
   const selectedOption = options.find((option) => +option.value === +value!);
 
   return (
@@ -49,7 +47,7 @@ const Select: React.FC<CustomSelectProps> = ({
       <div className="relative inline-block w-full sm:w-64" ref={inputRef}>
         <div
           className={`bg-white border ${
-            error ? "border-red-500" : "border-gray"
+            error ? "border-danger" : "border-gray"
           } rounded-full shadow-sm px-5 py-[11px] pr-10 text-left cursor-pointer focus:outline-none sm:text-sm`}
           onClick={() => setIsOpen(!isOpen)}
         >
@@ -57,11 +55,10 @@ const Select: React.FC<CustomSelectProps> = ({
             {selectedOption ? selectedOption.label : "Выбрать"}
           </span>
           <div
-            className={`absolute inset-y-0 right-4 flex items-center pointer-events-none text-black transition-all ${
+            className={`absolute right-4 top-3 flex pointer-events-none text-black transition-all ${
               isOpen ? "rotate-180" : ""
             }`}
           >
-            {/* SVG icon */}
             <svg
               width="24"
               height="24"

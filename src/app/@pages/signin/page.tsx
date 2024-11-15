@@ -5,6 +5,7 @@ import useAuth from "@/hooks/useAuth";
 import { LoginArg, useLoginMutation } from "@/redux/app/apiSlice";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { enqueueSnackbar } from "notistack";
 import { Controller, useForm } from "react-hook-form";
 
 // Страница авторизации
@@ -14,22 +15,28 @@ const Page = () => {
   const { setToken } = useAuth();
   const router = useRouter();
 
+
   const onSubmit = async (data: LoginArg) => {
     try {
       const result = await login(data).unwrap();
 
-      // Сохраняем токен в Cookies, если авторизация успешна
+      // Сохраняем токен в localStorage, если авторизация успешна
       if (result.token) {
         setToken(result.token);
       }
 
-      router.push('/catalog')
+      enqueueSnackbar("Вы успешно авторизовались", { variant: "success" });
+
+      // Перенаправляем пользователя на каталог
+      router.push('/catalog');
+
       // Сброс формы после успешной авторизации
       reset();
     } catch (error) {
       console.error(error);
     }
   };
+
 
   return (
     <div className="w-full h-full flex items-center justify-center mt-40">

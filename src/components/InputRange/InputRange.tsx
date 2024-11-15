@@ -1,28 +1,25 @@
-// components/InputRange.tsx
-
-import React, { FC, useState } from "react";
+import React, { FC, InputHTMLAttributes, useEffect } from "react";
 import ReactSlider from "react-slider";
 import Input from "../Input/Input";
+import { FieldError } from "react-hook-form";
+import ErrorText from "../ErrorText";
+
+type InputAttributes = InputHTMLAttributes<HTMLInputElement>;
 
 type Props = {
   className?: string;
-};
+  error?: FieldError;
+  value: number;
+  onChange: (newValue: number) => void;
+} & InputAttributes;
 
-const InputRange: FC<Props> = ({ className }) => {
-  const [value, setValue] = useState<number>(1901);
-
-  const handleChange = (newValue: number) => {
-    if (newValue >= 1901 && newValue <= today) {
-      setValue(newValue);
-    }
-  };
+const InputRange: FC<Props> = ({ className, error, value, onChange, ...rest }) => {
+  const today = new Date().getFullYear();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const newValue = Number(e.target.value);
-    setValue(newValue);
+    onChange(newValue);
   };
-
-  const today = new Date().getFullYear();
 
   return (
     <div className={`${className}`}>
@@ -34,7 +31,7 @@ const InputRange: FC<Props> = ({ className }) => {
           min="1901"
           max={today}
           onChange={handleInputChange}
-          className="w-28 *:!text-center"
+          className="w-28 text-center"
         />
       </label>
       <div className="relative">
@@ -48,14 +45,14 @@ const InputRange: FC<Props> = ({ className }) => {
           min={1901}
           max={today}
           value={value}
-          onChange={handleChange}
-          // renderThumb={(props, state) => <div {...props}>{state.valueNow}</div>}
+          onChange={onChange}
           ariaLabel="Year slider"
         />
         <span className="absolute top-3 -right-1 text-gray-dark text-sm">
           {today}
         </span>
       </div>
+      <ErrorText error={error} />
     </div>
   );
 };

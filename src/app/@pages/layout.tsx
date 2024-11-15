@@ -1,16 +1,19 @@
 "use client";
 import Button from "@/components/Button/Button";
+import useAuth from "@/hooks/useAuth";
 import { imagePath } from "@/utils/utils";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
+import { enqueueSnackbar } from "notistack";
 import { FC, PropsWithChildren } from "react";
 import { LiaBookSolid } from "react-icons/lia";
 
 // Лэйаут страниц
 // (верхний уровень страниц, код страниц передается автоматически через children)
 const Layout: FC<PropsWithChildren> = ({ children }) => {
+  const { token, clearToken } = useAuth(); // Получение токена и функции выхода
   const pathname = usePathname(); // получение пути текущей страницы
   const router = useRouter(); // получение переменной для навигации
 
@@ -19,6 +22,19 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
     hidden: { opacity: 0, y: 50 },
     enter: { opacity: 1, y: 0 },
   };
+
+  const handleLogout = () => {
+    const isConfirmed = window.confirm("Вы уверены, что хотите выйти из аккаунта?");
+    
+    if (isConfirmed) {
+      clearToken(); // Удаляем токен
+      router.push("/catalog"); // Перенаправляем пользователя
+      enqueueSnackbar("Вы успешно вышли из аккаунта", {
+        variant: "success",
+      });
+    }
+  };
+  
 
   return (
     <>
@@ -55,7 +71,9 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
                     </defs>
                   </svg>
                   <div className="w-[1px] h-[30px] bg-[#E9E9E9] hidden sm:block"></div>
-                  <div className="text-primary text-xl font-medium hidden sm:block">Научная библиотека</div>
+                  <div className="text-primary text-xl font-medium hidden sm:block">
+                    Научная библиотека
+                  </div>
                 </Link>
                 {/* <Image
                 alt="blur"
@@ -66,15 +84,29 @@ const Layout: FC<PropsWithChildren> = ({ children }) => {
               /> */}
               </div>
 
-              {pathname.split("/").splice(-1)[0] !== "book-add" && (
-                <Button
-                  onClick={() => router.push("/book-add")}
-                  variant="primary"
-                  className="!w-fit flex-shrink-0"
-                >
-                  Добавить книгу
-                </Button>
-              )}
+              <div className="flex items-center gap-4">
+                {/* Кнопка "Добавить книгу" только для авторизованных пользователей */}
+                {token && pathname.split("/").splice(-1)[0] !== "book-add" && (
+                  <Button
+                    onClick={() => router.push("/book-add")}
+                    variant="primary"
+                    className="!w-fit flex-shrink-0"
+                  >
+                    Добавить книгу
+                  </Button>
+                )}
+
+                {/* Кнопка "Выйти" */}
+                {token && (
+                  <Button
+                    onClick={handleLogout}
+                    variant="danger"
+                    className="!w-fit flex-shrink-0"
+                  >
+                    Выйти
+                  </Button>
+                )}
+              </div>
             </div>
           </header>
         )}

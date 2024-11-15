@@ -1,5 +1,9 @@
 import { FC, InputHTMLAttributes } from "react";
-import { ControllerFieldState, ControllerRenderProps, FieldError } from "react-hook-form";
+import {
+  ControllerFieldState,
+  ControllerRenderProps,
+  FieldError,
+} from "react-hook-form";
 import { twMerge } from "tailwind-merge";
 import ErrorText from "../ErrorText";
 
@@ -34,7 +38,9 @@ const Input: FC<Props> = ({
       )}
       <input
         {...rest}
-        className="w-full bg-white shadow-sm px-5 py-3 text-sm text-black placeholder:text-sm placeholder:text-[#9CA3AF] rounded-full"
+        className={`w-full bg-white border shadow-sm px-5 py-3 text-sm text-black placeholder:text-sm placeholder:text-[#9CA3AF] rounded-full ${
+          error ? "border-danger" : "border-gray"
+        }`}
         type={type}
         placeholder={placeholder}
       />

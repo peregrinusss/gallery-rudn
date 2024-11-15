@@ -119,11 +119,6 @@ const Page: FC = () => {
           onClick={toggleOpen}
         >
           <span className="text-xl text-primary font-semibold">Фильтр</span>
-          {/* <MdOutlineKeyboardArrowDown
-            className={`text-black w-8 h-8 transition-all ${
-              open && "rotate-180"
-            }`}
-          /> */}
           <div className={`transition-all ${open && "rotate-180"}`}>
             <svg
               width="24"
@@ -230,7 +225,7 @@ const Page: FC = () => {
             )}
             <div className="flex flex-col gap-1">
               <span className="text-base text-gray-dark font-normal">Год</span>
-              <InputRange className="sm:w-64" />
+              <InputRange onChange={() => {}} value={1901} className="sm:w-64" />
             </div>
           </div>
         </Collapse>

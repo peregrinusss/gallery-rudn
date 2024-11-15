@@ -27,6 +27,7 @@ import { Controller, useForm, useWatch } from "react-hook-form";
 import { IoClose } from "react-icons/io5";
 import "swiper/css";
 import "swiper/css/pagination";
+import InputRange from "@/components/InputRange/InputRange";
 
 // Страница авторизации
 const Page: FC<CatalogPagesParams> = ({ params }) => {
@@ -37,7 +38,7 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
   const router = useRouter();
 
   // Получение книги с апи
-  const [getBook] = useGetBookByIdMutation();
+  const [getBook, refetch] = useGetBookByIdMutation();
   const [book, setBook] = useState<BookDetails>();
   const [deleteBook] = useDeleteBookMutation();
 
@@ -46,7 +47,12 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
       try {
         const result = await getBook({ id: bookId }).unwrap();
         setBook(result);
-        setExistingImages(result.Images.map((img) => createImageSrc(img.path)));
+        setExistingImages(
+          result.Images.map((img) => ({
+            path: createImageSrc(img.path),
+            idImg: img.idImg,
+          }))
+        );
       } catch (error) {
         console.error(error);
       }
@@ -68,8 +74,11 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
   const { idCountry } = useWatch({ control });
   const [updateBook] = useUpdateBookMutation();
   const [bookImages, setBookImages] = useState<File[]>([]);
-  const [existingImages, setExistingImages] = useState<string[]>([]);
+  const [existingImages, setExistingImages] = useState<
+    { path: string; idImg: number }[]
+  >([]);
   const [imagesToRemove, setImagesToRemove] = useState<string[]>([]);
+  const [imagesError, setImagesError] = useState<string | null>(null);
 
   useEffect(() => {
     if (book) {
@@ -80,12 +89,21 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
         idCountry: book.idCountry,
         idPublisher: book.idPublisher,
         name: book.name,
-        year: book.yearPublisher,
+        year: +book.yearPublisher,
+        idSRF: book.idSRF || null,
+        Author: book.Authors.map((author) => author.idAuthor.toString()),
       });
     }
   }, [book]);
 
   const handleAddBook = async (data: addBookArg) => {
+    if (bookImages.length === 0 && existingImages.length === 0) {
+      setImagesError("Загрузите хотя бы одно изображение");
+      return;
+    } else {
+      setImagesError(null);
+    }
+
     const formData = new FormData();
 
     // Append new data
@@ -93,18 +111,27 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
 
     // Append new images
     bookImages.forEach((file) => {
-      formData.append("images[]", file);
+      formData.append("newImages[]", file);
     });
 
     // Append existing images that haven't been removed
-    existingImages.forEach((img, index) => {
-      if (!imagesToRemove.includes(img)) {
-        formData.append(`images[]`, img);
+    existingImages.forEach((img: { path: string; idImg: number }, index) => {
+      if (!imagesToRemove.includes(img.idImg.toString())) {
+        formData.append(`oldImages[]`, img.idImg.toString());
       }
     });
 
     try {
       const res = await updateBook(formData).unwrap();
+
+      const result = await getBook({ id: bookId }).unwrap();
+      setBook(result);
+      setExistingImages(
+        result.Images.map((img) => ({
+          path: createImageSrc(img.path),
+          idImg: img.idImg,
+        }))
+      );
 
       enqueueSnackbar("Книга успешно обновлена", { variant: "success" });
     } catch (e) {
@@ -114,12 +141,12 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
 
   const handleDeleteBook = async () => {
     const isConfirmed = window.confirm("Вы уверены, что хотите удалить книгу?");
-  
+
     if (!isConfirmed) return;
-  
+
     try {
-      const res = await deleteBook({idBibD: +bookId}).unwrap();
-  
+      const res = await deleteBook({ idBibD: +bookId }).unwrap();
+
       enqueueSnackbar("Книга успешно удалена", { variant: "success" });
       router.back();
     } catch (e) {
@@ -132,16 +159,31 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
     if (files) {
       const filesArray = Array.from(files);
       setBookImages((prevImages) => [...prevImages, ...filesArray]);
+
+      if (filesArray.length > 0) {
+        setImagesError(null);
+      }
     }
   };
 
   const handleRemoveImage = (index: number, isExisting = false) => {
     if (isExisting) {
+      // Удаляем существующее изображение по id
       const imgToRemove = existingImages[index];
-      setImagesToRemove((prev) => [...prev, imgToRemove]);
+      console.log(imgToRemove);
+
+      setImagesToRemove((prev) => [...prev, imgToRemove.idImg.toString()]);
       setExistingImages((prev) => prev.filter((_, i) => i !== index));
     } else {
-      setBookImages((prev) => prev.filter((_, i) => i !== index));
+      // Удаляем добавленное изображение по индексу
+      setBookImages((prev) => prev.filter((_, index) => index !== index));
+    }
+
+    if (bookImages.length === 0 && existingImages.length === 0) {
+      setImagesError("Загрузите хотя бы одно изображение");
+      return;
+    } else {
+      setImagesError(null);
     }
   };
 
@@ -163,11 +205,9 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
         <Controller
           control={control}
           name="name"
-          rules={{ required: "Заполните поле" }}
           render={({ field, fieldState }) => (
             <Input
               {...field}
-              error={fieldState.error}
               label="Название"
               placeholder="Введите название книги"
               type="text"
@@ -175,29 +215,28 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
             />
           )}
         />
-        <Controller
-          control={control}
-          name="year"
-          // rules={{ required: "Заполните поле" }}
-          render={({ field, fieldState }) => (
-            <Input
-              {...field}
-              error={fieldState.error}
-              label="Год выпуска"
-              placeholder="Введите год выпуска"
-              type="text"
-              className="flex flex-col gap-1"
-            />
-          )}
-        />
+        <div className="flex flex-col gap-1">
+          <span className="block text-base text-black font-normal mb-1">
+            Год выпуска
+          </span>
+          <Controller
+            control={control}
+            name="year"
+            render={({ field, fieldState }) => (
+              <InputRange
+                className="sm:w-64 mb-6"
+                value={field.value}
+                onChange={field.onChange}
+              />
+            )}
+          />
+        </div>
         <Controller
           control={control}
           name="description"
-          // rules={{ required: "Заполните поле" }}
           render={({ field, fieldState }) => (
             <Input
               {...field}
-              error={fieldState.error}
               label="Описание"
               placeholder="Введите описание"
               type="text"
@@ -208,11 +247,9 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
         <Controller
           control={control}
           name="addInfo"
-          // rules={{ required: "Заполните поле" }}
           render={({ field, fieldState }) => (
             <Input
               {...field}
-              error={fieldState.error}
               label="Доп. информация"
               placeholder="Введите доп. информацию"
               type="text"
@@ -235,7 +272,6 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
                 }))}
                 value={field.value!}
                 onChange={field.onChange}
-                error={fieldState.error}
               />
             )}
           />
@@ -247,7 +283,6 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
           <Controller
             control={control}
             name="idPublisher"
-            rules={{ required: "Заполните поле" }}
             render={({ field, fieldState }) => (
               <Select
                 options={(publishers?.Publisher || [])?.map((item) => ({
@@ -256,7 +291,6 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
                 }))}
                 value={field.value}
                 onChange={field.onChange}
-                error={fieldState.error}
               />
             )}
           />
@@ -290,6 +324,7 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
             <Controller
               control={control}
               name="idSRF"
+              rules={{ required: "Заполните поле" }}
               render={({ field, fieldState }) => (
                 <Select
                   options={(subrfs?.SubjectRF || [])?.map((item) => ({
@@ -322,12 +357,12 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
                       : item.name + " " + item.surname + " " + item.patronymic,
                 }))}
                 onChange={onChange}
-                value={+value}
+                value={value}
               />
             )}
           />
         </div>
-        <div className="flex flex-col gap-1">
+        <div className="flex flex-col gap-1 w-fit">
           <span className="block text-base text-black font-normal mb-1">
             Загрузить изображения
           </span>
@@ -349,6 +384,11 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
               </span>
             </label>
           </div>
+          {imagesError && (
+            <span className="block text-danger text-[10px] text-center mt-3">
+              {imagesError}
+            </span>
+          )}
         </div>
 
         {existingImages.length > 0 && (
@@ -360,7 +400,7 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
               {existingImages.map((image, index) => (
                 <div key={index} className="relative w-fit">
                   <Image
-                    src={image}
+                    src={image.path}
                     width={500}
                     height={500}
                     alt={`preview ${index}`}
@@ -394,7 +434,7 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
                     className="w-40 h-40 object-cover rounded"
                   />
                   <button
-                    onClick={() => handleRemoveImage(index)}
+                    onClick={() => handleRemoveImage(index, false)}
                     className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full p-1 bg-white shadow-xl"
                   >
                     <IoClose className="w-6 h-6 text-black" />
