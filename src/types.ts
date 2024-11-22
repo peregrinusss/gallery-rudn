@@ -57,6 +57,10 @@ export type FilterOptions = {
     idSubjectRF: string;
     subjectRF: string;
   }[];
+  Publisher: {
+    idPublisher: string;
+    publisher: string;
+  }[];
   Author: {
     idAuthor: string;
     surname: string;

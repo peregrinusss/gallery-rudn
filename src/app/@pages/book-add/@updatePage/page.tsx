@@ -190,7 +190,7 @@ const Page = () => {
             )}
             <div className="flex flex-col gap-1">
               <span className="text-base text-gray-dark font-normal">Год</span>
-              <InputRange className="sm:w-64" />
+              <InputRange onChange={() => {}} value={1901} className="sm:w-64" />
             </div>
           </div>
         </Collapse>

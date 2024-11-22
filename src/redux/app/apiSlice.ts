@@ -92,6 +92,17 @@ export type LoginArg = {
   password: string;
 };
 
+export type GetBooksApiArg = {
+  query?: any;
+  filContinent?: number[];
+  filCountry?: number[];
+  filCity?: number[];
+  filFD?: number[];
+  filSubjectRF?: number[];
+  filAuthor?: number[];
+  filPublishing?: number[];
+};
+
 // Все запросы к апи
 export const apiSlice = createApi({
   reducerPath: "api",
@@ -107,12 +118,19 @@ export const apiSlice = createApi({
         body,
       }),
     }),
-    getBooks: builder.query<Books, { query?: string }>({
+    getBooks: builder.query<Books, GetBooksApiArg>({
       query: (queryArg) => ({
         url: "interface/catalog.php",
         method: "GET",
         params: {
           query: queryArg.query,
+          filContinent: queryArg.filContinent,
+          filCountry: queryArg.filCountry,
+          filCity: queryArg.filCity,
+          filFD: queryArg.filFD,
+          filSubjectRF: queryArg.filSubjectRF,
+          filAuthor: queryArg.filAuthor,
+          filPublishing: queryArg.filPublishing,
         },
       }),
     }),

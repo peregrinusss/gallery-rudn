@@ -106,8 +106,11 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
 
     const formData = new FormData();
 
+    // Вставка idBibD в объект data
+    const updatedData = { ...data, idBibD: bookId };
+
     // Append new data
-    formData.append("json", JSON.stringify(data));
+    formData.append("json", JSON.stringify(updatedData));
 
     // Append new images
     bookImages.forEach((file) => {

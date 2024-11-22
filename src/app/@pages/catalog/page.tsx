@@ -1,5 +1,6 @@
 "use client";
 import BookPreview from "@/components/BookPreview/BookPreview";
+import Button from "@/components/Button/Button";
 import InputRange from "@/components/InputRange/InputRange";
 import Search from "@/components/Search/Search";
 import Select, { Option } from "@/components/Select/Select";
@@ -29,12 +30,39 @@ const Page: FC = () => {
   // Переменная для роутинга
   const router = useRouter();
 
+  const [sort, setSort] = useQueryStates<{
+    filContinent: ParserBuilder<string>;
+    filCountry: ParserBuilder<string>;
+    filCity: ParserBuilder<string>;
+    filFD: ParserBuilder<string>;
+    filSubjectRF: ParserBuilder<string>;
+    filAuthor: ParserBuilder<string>;
+    filPublishing: ParserBuilder<string>;
+  }>({
+    filContinent: parseAsString,
+    filCountry: parseAsString,
+    filCity: parseAsString,
+    filFD: parseAsString,
+    filSubjectRF: parseAsString,
+    filAuthor: parseAsString,
+    filPublishing: parseAsString,
+  });
+
   // Получения каталога книг с апи
   const {
     data: booksData,
     isLoading,
     error,
-  } = useGetBooksQuery({ query: q || "" });
+  } = useGetBooksQuery({
+    query: q || "",
+    filContinent: sort.filContinent ? [+sort.filContinent] : [],
+    filCountry: sort.filCountry ? [+sort.filCountry] : [],
+    filCity: sort.filCity ? [+sort.filCity] : [],
+    filFD: sort.filFD ? [+sort.filFD] : [],
+    filSubjectRF: sort.filSubjectRF ? [+sort.filSubjectRF] : [],
+    filAuthor: sort.filAuthor ? [+sort.filAuthor] : [],
+    filPublishing: sort.filPublishing ? [+sort.filPublishing] : [],
+  });
 
   const { data: fitlerOptions } = useGetFilterOptionsQuery({});
   const [filteredBooks, setFilteredBooks] = useState<Book[]>([]);
@@ -67,17 +95,18 @@ const Page: FC = () => {
     setOpen(true);
   };
 
-  // Обработка поискового запроса
-  // useEffect(() => {
-  //   if (booksData && booksData.Books) {
-  //     const filtered = booksData.Books.filter((book) => {
-  //       // Замена null значения на "Неизвестная книга"
-  //       const bookName = book.name || "Неизвестная книга";
-  //       return q ? bookName.toLowerCase().includes(q.toLowerCase()) : true;
-  //     });
-  //     setFilteredBooks(filtered);
-  //   }
-  // }, [booksData, q]);
+  const handleResetFilter = () => {
+    setSort({
+      filContinent: null,
+      filAuthor: null,
+      filCity: null,
+      filCountry: null,
+      filFD: null,
+      filPublishing: null,
+      filSubjectRF: null,
+    })
+  }
+  
 
   return (
     <div className="">
@@ -136,9 +165,9 @@ const Page: FC = () => {
         </div>
 
         <Collapse isOpened={open}>
-          <div className="flex flex-wrap items-start gap-6 mt-2">
+          <div className="flex flex-col sm:flex-wrap sm:flex-row items-start gap-6 mt-2">
             {fitlerOptions?.Continent && (
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 w-full sm:w-fit">
                 <span className="text-base text-gray-dark font-normal">
                   Континент
                 </span>
@@ -147,12 +176,17 @@ const Page: FC = () => {
                     value: item.idContinent,
                     label: item.continent,
                   }))}
-                  // onChange={handleSelectChange}
+                  onChange={(e) =>
+                    setSort({
+                      filContinent: e.toString() || null,
+                    })
+                  }
+                  value={sort.filContinent || ""}
                 />
               </div>
             )}
             {fitlerOptions?.Country && (
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 w-full sm:w-fit">
                 <span className="text-base text-gray-dark font-normal">
                   Страна
                 </span>
@@ -161,12 +195,17 @@ const Page: FC = () => {
                     value: item.idCountry,
                     label: item.country,
                   }))}
-                  // onChange={handleSelectChange}
+                  onChange={(e) =>
+                    setSort({
+                      filCountry: e.toString() || null,
+                    })
+                  }
+                  value={sort.filCountry || ""}
                 />
               </div>
             )}
             {fitlerOptions?.City && (
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 w-full sm:w-fit">
                 <span className="text-base text-gray-dark font-normal">
                   Город
                 </span>
@@ -175,12 +214,17 @@ const Page: FC = () => {
                     value: item.idCity,
                     label: item.city,
                   }))}
-                  // onChange={handleSelectChange}
+                  onChange={(e) =>
+                    setSort({
+                      filCity: e.toString() || null,
+                    })
+                  }
+                  value={sort.filCity || ""}
                 />
               </div>
             )}
             {fitlerOptions?.FederalDistrict && (
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 w-full sm:w-fit">
                 <span className="text-base text-gray-dark font-normal">
                   Федеральный округ России
                 </span>
@@ -189,12 +233,17 @@ const Page: FC = () => {
                     value: item.idFederalDistrict,
                     label: item.federalDistrict,
                   }))}
-                  // onChange={handleSelectChange}
+                  onChange={(e) =>
+                    setSort({
+                      filFD: e.toString() || null,
+                    })
+                  }
+                  value={sort.filFD || ""}
                 />
               </div>
             )}
             {fitlerOptions?.SubjectRF && (
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 w-full sm:w-fit">
                 <span className="text-base text-gray-dark font-normal">
                   Субъект РФ
                 </span>
@@ -203,12 +252,17 @@ const Page: FC = () => {
                     value: item.idSubjectRF,
                     label: item.subjectRF,
                   }))}
-                  // onChange={handleSelectChange}
+                  onChange={(e) =>
+                    setSort({
+                      filSubjectRF: e.toString() || null,
+                    })
+                  }
+                  value={sort.filSubjectRF || ""}
                 />
               </div>
             )}
             {fitlerOptions?.Author && (
-              <div className="flex flex-col gap-1">
+              <div className="flex flex-col gap-1 w-full sm:w-fit">
                 <span className="text-base text-gray-dark font-normal">
                   Автор
                 </span>
@@ -219,15 +273,44 @@ const Page: FC = () => {
                       ? `${item.nameAuthor} ${item.surname} ${item.patronymic}`
                       : item.entity,
                   }))}
-                  // onChange={handleSelectChange}
+                  onChange={(e) =>
+                    setSort({
+                      filAuthor: e.toString() || null,
+                    })
+                  }
+                  value={sort.filAuthor || ""}
                 />
               </div>
             )}
-            <div className="flex flex-col gap-1">
+            {fitlerOptions?.Publisher && (
+              <div className="flex flex-col gap-1 w-full sm:w-fit">
+                <span className="text-base text-gray-dark font-normal">
+                  Издательство
+                </span>
+                <Select
+                  options={fitlerOptions?.Publisher.map((item) => ({
+                    value: item.idPublisher,
+                    label: item.publisher,
+                  }))}
+                  onChange={(e) =>
+                    setSort({
+                      filPublishing: e.toString() || null,
+                    })
+                  }
+                  value={sort.filPublishing || ""}
+                />
+              </div>
+            )}
+            {/* <div className="flex flex-col gap-1">
               <span className="text-base text-gray-dark font-normal">Год</span>
-              <InputRange onChange={() => {}} value={1901} className="sm:w-64" />
-            </div>
+              <InputRange
+                onChange={() => {}}
+                value={1901}
+                className="sm:w-64"
+              />
+            </div> */}
           </div>
+          <Button onClick={handleResetFilter} variant="danger" className="sm:!w-fit mt-5">Сбросить</Button>
         </Collapse>
       </div>
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-5 mt-10">
