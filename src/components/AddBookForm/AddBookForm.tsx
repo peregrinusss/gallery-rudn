@@ -285,10 +285,9 @@ const AddBookForm: React.FC = () => {
             <MultiSelect
               options={(authors?.Author || [])?.map((item) => ({
                 value: item.idAuthor,
-                label:
-                  item.entity !== null
-                    ? item.entity
-                    : item.name + " " + item.surname + " " + item.patronymic,
+                label: item.name
+                  ? `${item.patronymic ?? ""} ${item.name} ${item.surname}`
+                  : item.entity,
               }))}
               onChange={onChange}
               value={value}
@@ -317,7 +316,9 @@ const AddBookForm: React.FC = () => {
           </label>
         </div>
         {imagesError && (
-          <span className="block text-danger text-[10px] text-center mt-3">{imagesError}</span>
+          <span className="block text-danger text-[10px] text-center mt-3">
+            {imagesError}
+          </span>
         )}
       </div>
       {base64Images.length > 0 && (

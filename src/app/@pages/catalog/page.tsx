@@ -270,7 +270,7 @@ const Page: FC = () => {
                   options={fitlerOptions?.Author.map((item) => ({
                     value: item.idAuthor,
                     label: item.nameAuthor
-                      ? `${item.nameAuthor} ${item.surname} ${item.patronymic}`
+                      ? `${item.patronymic ?? ""} ${item.nameAuthor} ${item.surname}`
                       : item.entity,
                   }))}
                   onChange={(e) =>

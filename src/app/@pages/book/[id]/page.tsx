@@ -354,10 +354,9 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
               <MultiSelect
                 options={(authors?.Author || [])?.map((item) => ({
                   value: item.idAuthor,
-                  label:
-                    item.entity !== null
-                      ? item.entity
-                      : item.name + " " + item.surname + " " + item.patronymic,
+                  label: item.name
+                    ? `${item.patronymic ?? ""} ${item.name} ${item.surname}`
+                    : item.entity,
                 }))}
                 onChange={onChange}
                 value={value}
