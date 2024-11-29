@@ -54,7 +54,7 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
           {book?.name ? book?.name : "Неизвестная книга"}
         </h2>
         <div className="flex gap-3 flex-wrap">
-          {book?.Authors[0].name ? (
+          {book?.Authors && book?.Authors?.length > 0 ? (
             book?.Authors?.map((author, index) => (
               <span
                 key={index}
