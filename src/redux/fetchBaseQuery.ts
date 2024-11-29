@@ -1,7 +1,7 @@
 import { fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 const baseQuery = fetchBaseQuery({
-  baseUrl: "http://95.165.168.235:65080/RUDN_Gallery/php/",
+  baseUrl: `${process.env.NEXT_PUBLIC_SERVER_URL}/RUDN_Gallery/php/`,
   prepareHeaders: (headers) => {
     // Получаем токен из localStorage
     const token = localStorage.getItem("token");

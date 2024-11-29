@@ -7,5 +7,5 @@ export const imagePath = (src: string) => {
 
 export const createImageSrc = (src: string) => {
   if (!src) "/book-preview.jpeg";
-  return `http://95.165.168.235:65080/${src}`;
+  return `${process.env.NEXT_PUBLIC_SERVER_URL}/${src}`;
 };
