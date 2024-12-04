@@ -1,57 +1,101 @@
 "use client";
 
-import React, { use, useState } from "react";
-import {
-  addBookArg,
-  useAddBookMutation,
-  useGetAuthorsQuery,
-  useGetCitiesQuery,
-  useGetCountriesQuery,
-  useGetPublishersQuery,
-  useGetSubrfQuery,
-} from "@/redux/app/apiSlice";
-import { Controller, useForm, useWatch } from "react-hook-form";
-import { enqueueSnackbar } from "notistack";
 import Button from "@/components/Button/Button";
 import Input from "@/components/Input/Input";
 import InputRange from "@/components/InputRange/InputRange";
 import MultiSelect from "@/components/MultiSelect/MultiSelect";
 import Select from "@/components/Select/Select";
+import {
+  addBookArg,
+  useDeleteBookMutation,
+  useGetAuthorsQuery,
+  useGetBookByIdMutation,
+  useGetCitiesQuery,
+  useGetCountriesQuery,
+  useGetPublishersQuery,
+  useGetSubrfQuery,
+  useUpdateBookMutation,
+} from "@/redux/app/apiSlice";
+import { BookDetails } from "@/types";
+import { createImageSrc } from "@/utils/utils";
 import Image from "next/image";
+import { enqueueSnackbar } from "notistack";
+import React, { FC, useEffect, useState } from "react";
+import { Controller, useForm, useWatch } from "react-hook-form";
 import { IoClose } from "react-icons/io5";
 import Textarea from "../Textarea/Textarea";
+import { useRouter } from "next/navigation";
+
+type Props = {
+  bookId: string;
+  setIsEdit: React.Dispatch<React.SetStateAction<boolean>>;
+};
 
 // Форма создания книги
-const AddBookForm: React.FC = () => {
+const UpdateBookForm: FC<Props> = ({ bookId, setIsEdit }) => {
+  // Получение книги с апи
+  const [getBook] = useGetBookByIdMutation();
+  const [book, setBook] = useState<BookDetails>();
+  const [deleteBook] = useDeleteBookMutation();
+
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchBook = async () => {
+      try {
+        const result = await getBook({ id: bookId }).unwrap();
+        setBook(result);
+        setExistingImages(
+          result.Images.map((img) => ({
+            path: createImageSrc(img.path),
+            idImg: img.idImg,
+          }))
+        );
+      } catch (error) {
+        console.error(error);
+      }
+    };
+
+    if (bookId) {
+      fetchBook();
+    }
+  }, [bookId, getBook]);
+
   const { data: cities } = useGetCitiesQuery({});
   const { data: publishers } = useGetPublishersQuery({});
   const { data: countries } = useGetCountriesQuery({});
   const { data: subrfs } = useGetSubrfQuery({});
   const { data: authors } = useGetAuthorsQuery({});
-  const [addBook] = useAddBookMutation();
 
-  const { control, handleSubmit, reset, setValue } = useForm<addBookArg>({
-    defaultValues: {
-      addInfo: null,
-      description: null,
-      idCity: null,
-      idCountry: null,
-      idPublisher: null,
-      name: null,
-      year: 1901,
-      Author: [],
-      idSRF: null,
-    },
-  });
-
+  // обновление книги
+  const { control, handleSubmit, reset, setValue } = useForm<addBookArg>();
   const { idCountry } = useWatch({ control });
-
+  const [updateBook] = useUpdateBookMutation();
   const [bookImages, setBookImages] = useState<File[]>([]);
-  const [base64Images, setBase64Images] = useState<string[]>([]);
+  const [existingImages, setExistingImages] = useState<
+    { path: string; idImg: number }[]
+  >([]);
+  const [imagesToRemove, setImagesToRemove] = useState<string[]>([]);
   const [imagesError, setImagesError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (book) {
+      reset({
+        addInfo: book.addInformation,
+        description: book.description,
+        idCity: book.idCity,
+        idCountry: book.idCountry,
+        idPublisher: book.idPublisher,
+        name: book.name,
+        year: +book.yearPublisher,
+        idSRF: book.idSRF || null,
+        Author: book.Authors.map((author) => author.idAuthor.toString()),
+      });
+    }
+  }, [book]);
+
   const handleAddBook = async (data: addBookArg) => {
-    if (bookImages.length === 0) {
+    if (bookImages.length === 0 && existingImages.length === 0) {
       setImagesError("Загрузите хотя бы одно изображение");
       return;
     } else {
@@ -59,29 +103,54 @@ const AddBookForm: React.FC = () => {
     }
 
     const formData = new FormData();
-    formData.append("json", JSON.stringify(data));
 
+    // Вставка idBibD в объект data
+    const updatedData = { ...data, idBibD: bookId };
+
+    // Append new data
+    formData.append("json", JSON.stringify(updatedData));
+
+    // Append new images
     bookImages.forEach((file) => {
-      formData.append("images[]", file);
+      formData.append("newImages[]", file);
+    });
+
+    // Append existing images that haven't been removed
+    existingImages.forEach((img: { path: string; idImg: number }, index) => {
+      if (!imagesToRemove.includes(img.idImg.toString())) {
+        formData.append(`oldImages[]`, img.idImg.toString());
+      }
     });
 
     try {
-      const res = await addBook(formData).unwrap();
-      reset({
-        addInfo: null,
-        description: null,
-        idCity: undefined,
-        idCountry: undefined,
-        idPublisher: undefined,
-        name: null,
-        year: 1901,
-        Author: [],
-        idSRF: null,
-      });
-      setValue("Author", []);
-      setBase64Images([]);
-      setBookImages([]);
-      enqueueSnackbar("Книга успешно добавлена", { variant: "success" });
+      const res = await updateBook(formData).unwrap();
+
+      const result = await getBook({ id: bookId }).unwrap();
+      setBook(result);
+      setExistingImages(
+        result.Images.map((img) => ({
+          path: createImageSrc(img.path),
+          idImg: img.idImg,
+        }))
+      );
+
+      enqueueSnackbar("Книга успешно обновлена", { variant: "success" });
+      setIsEdit(false);
+    } catch (e) {
+      enqueueSnackbar("К сожалению, что-то пошло не так", { variant: "error" });
+    }
+  };
+
+  const handleDeleteBook = async () => {
+    const isConfirmed = window.confirm("Вы уверены, что хотите удалить книгу?");
+
+    if (!isConfirmed) return;
+
+    try {
+      const res = await deleteBook({ idBibD: +bookId }).unwrap();
+
+      enqueueSnackbar("Книга успешно удалена", { variant: "success" });
+      router.back();
     } catch (e) {
       enqueueSnackbar("К сожалению, что-то пошло не так", { variant: "error" });
     }
@@ -92,7 +161,6 @@ const AddBookForm: React.FC = () => {
     if (files) {
       const filesArray = Array.from(files);
       setBookImages((prevImages) => [...prevImages, ...filesArray]);
-      convertFilesToBase64(filesArray);
 
       if (filesArray.length > 0) {
         setImagesError(null);
@@ -100,40 +168,29 @@ const AddBookForm: React.FC = () => {
     }
   };
 
-  const convertFilesToBase64 = (files: File[]) => {
-    const promises = files.map((file) => {
-      return new Promise<string>((resolve, reject) => {
-        const reader = new FileReader();
-        reader.readAsDataURL(file);
-        reader.onload = () => resolve(reader.result as string);
-        reader.onerror = (error) => reject(error);
-      });
-    });
+  const handleRemoveImage = (index: number, isExisting = false) => {
+    if (isExisting) {
+      // Удаляем существующее изображение по id
+      const imgToRemove = existingImages[index];
+      console.log(imgToRemove);
 
-    Promise.all(promises)
-      .then((results) =>
-        setBase64Images((prevBase64Images) => [...prevBase64Images, ...results])
-      )
-      .catch((error) =>
-        console.error("Error converting files to Base64:", error)
-      );
-  };
+      setImagesToRemove((prev) => [...prev, imgToRemove.idImg.toString()]);
+      setExistingImages((prev) => prev.filter((_, i) => i !== index));
+    } else {
+      // Удаляем добавленное изображение по индексу
+      setBookImages((prev) => prev.filter((_, index) => index !== index));
+    }
 
-  const handleRemoveImage = (index: number) => {
-    const updatedBookImages = bookImages.filter((_, i) => i !== index);
-    const updatedBase64Images = base64Images.filter((_, i) => i !== index);
-    setBookImages(updatedBookImages);
-    setBase64Images(updatedBase64Images);
-
-    if (updatedBookImages.length === 0) {
+    if (bookImages.length === 0 && existingImages.length === 0) {
       setImagesError("Загрузите хотя бы одно изображение");
+      return;
     } else {
       setImagesError(null);
     }
   };
 
   return (
-    <div className="flex flex-col gap-3">
+    <div className="mt-2 pt-4 flex flex-col gap-3">
       <Controller
         control={control}
         name="name"
@@ -155,18 +212,15 @@ const AddBookForm: React.FC = () => {
         <Controller
           control={control}
           name="year"
-          rules={{ required: "Заполните поле" }}
           render={({ field, fieldState }) => (
             <InputRange
               className="sm:w-64 mb-6"
-              error={fieldState.error}
-              value={field.value ?? 0}
               onChange={field.onChange}
+              value={field.value ?? 0}
             />
           )}
         />
       </div>
-
       <Controller
         control={control}
         name="description"
@@ -325,36 +379,78 @@ const AddBookForm: React.FC = () => {
           </span>
         )}
       </div>
-      {base64Images.length > 0 && (
-        <div className="flex items-center gap-5 flex-wrap">
-          {base64Images.map((image, index) => (
-            <div key={index} className="relative w-fit">
-              <Image
-                src={image}
-                width={500}
-                height={500}
-                alt={`preview ${index}`}
-                className="w-40 h-40 object-cover rounded"
-              />
-              <button
-                onClick={() => handleRemoveImage(index)}
-                className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full p-1 bg-white shadow-xl"
-              >
-                <IoClose className="w-6 h-6 text-black" />
-              </button>
-            </div>
-          ))}
+
+      {existingImages.length > 0 && (
+        <div className="flex flex-col gap-4 mt-4">
+          <h3 className="text-base text-black font-medium">
+            Текущие изображения
+          </h3>
+          <div className="flex items-center gap-5 flex-wrap">
+            {existingImages.map((image, index) => (
+              <div key={index} className="relative w-fit">
+                <Image
+                  src={image.path}
+                  width={500}
+                  height={500}
+                  alt={`preview ${index}`}
+                  className="w-40 h-40 object-cover rounded"
+                />
+                <button
+                  onClick={() => handleRemoveImage(index, true)}
+                  className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full p-1 bg-white shadow-xl"
+                >
+                  <IoClose className="w-6 h-6 text-black" />
+                </button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
-      <Button
-        onClick={handleSubmit(handleAddBook)}
-        variant="primary"
-        className="ml-auto xs:!w-fit !px-5"
-      >
-        Создать книгу
-      </Button>
+
+      {bookImages.length > 0 && (
+        <div className="flex flex-col gap-4 mt-4">
+          <h3 className="text-base text-black font-medium">
+            Новые изображения
+          </h3>
+          <div className="flex items-center gap-5 flex-wrap">
+            {bookImages.map((file, index) => (
+              <div key={index} className="relative w-fit">
+                <Image
+                  src={URL.createObjectURL(file)}
+                  width={500}
+                  height={500}
+                  alt={`preview ${index}`}
+                  className="w-40 h-40 object-cover rounded"
+                />
+                <button
+                  onClick={() => handleRemoveImage(index, false)}
+                  className="absolute -top-3 -right-3 bg-red-500 text-white rounded-full p-1 bg-white shadow-xl"
+                >
+                  <IoClose className="w-6 h-6 text-black" />
+                </button>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+      <div className="flex items-center gap-4 mt-4 w-fit ml-auto">
+        <Button
+          onClick={handleDeleteBook}
+          variant="danger"
+          className="ml-auto xs:!w-fit !px-5"
+        >
+          Удалить запись
+        </Button>
+        <Button
+          onClick={handleSubmit(handleAddBook)}
+          variant="primary"
+          className="ml-auto xs:!w-fit !px-5"
+        >
+          Обновить запись
+        </Button>
+      </div>
     </div>
   );
 };
 
-export default AddBookForm;
+export default UpdateBookForm;

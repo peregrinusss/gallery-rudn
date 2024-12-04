@@ -36,11 +36,11 @@ type fdResponse = {
 };
 
 export type addBookArg = {
-  name: string;
-  year: number;
+  name: string | null;
+  year: number | null;
   idPublisher: number | null;
-  description: string;
-  addInfo: string;
+  description: string | null;
+  addInfo: string | null;
   idCity: number | null;
   idCountry: number | null;
   idSRF: number | null;
@@ -101,6 +101,7 @@ export type GetBooksApiArg = {
   filSubjectRF?: number[];
   filAuthor?: number[];
   filPublishing?: number[];
+  filYear?: number | null;
 };
 
 // Все запросы к апи
@@ -131,6 +132,7 @@ export const apiSlice = createApi({
           filSubjectRF: queryArg.filSubjectRF,
           filAuthor: queryArg.filAuthor,
           filPublishing: queryArg.filPublishing,
+          filYear: queryArg.filYear,
         },
       }),
     }),

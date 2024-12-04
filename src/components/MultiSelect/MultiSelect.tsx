@@ -19,6 +19,7 @@ const MultiSelect: React.FC<CustomSelectProps> = ({
   onChange,
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
   const inputRef = useRef<HTMLDivElement>(null);
 
   // Выбор опций при клике
@@ -48,6 +49,11 @@ const MultiSelect: React.FC<CustomSelectProps> = ({
       document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
+
+  // Фильтрация опций на основе поиска
+  const filteredOptions = options.filter((option) =>
+    option.label?.toLowerCase().includes(searchQuery?.toLowerCase() || "")
+  );
 
   return (
     <div className="relative inline-block w-full sm:w-64" ref={inputRef}>
@@ -84,40 +90,56 @@ const MultiSelect: React.FC<CustomSelectProps> = ({
       </div>
       {isOpen && (
         <div className="absolute z-40 mt-1 w-full bg-white shadow-lg max-h-60 rounded-[16px] py-1 text-base ring-1 ring-black ring-opacity-5 overflow-auto scrollbar-thin scrollbar-thumb-primary scrollbar-track-transparent focus:outline-none sm:text-sm">
-          {options.map((option) => (
-            <div
-              key={option.value}
-              className="cursor-pointer select-none relative py-2 pl-4 pr-9 hover:bg-indigo-600 hover:*:text-primary"
-              onClick={() => handleOptionClick(option)}
-            >
-              <span
-                className={`block truncate transition-all ${
-                  value.includes(option.value)
-                    ? "font-medium text-primary"
-                    : "font-normal text-black"
-                }`}
+          {/* Поле для поиска */}
+          <div className="px-4 py-2">
+            <input
+              type="text"
+              placeholder="Поиск..."
+              className="w-full px-3 py-2 border border-gray-dark rounded-[10px] text-sm focus:outline-none"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          {filteredOptions.length > 0 ? (
+            filteredOptions.map((option) => (
+              <div
+                key={option.value}
+                className="cursor-pointer select-none relative py-2 pl-4 pr-9 hover:bg-indigo-600 hover:*:text-primary"
+                onClick={() => handleOptionClick(option)}
               >
-                {option.label}
-              </span>
-              {value.includes(option.value) && (
-                <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-primary">
-                  <svg
-                    className="h-5 w-5"
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    aria-hidden="true"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M16.704 5.293a1 1 0 00-1.416 0L8 12.586 4.712 9.298a1 1 0 10-1.424 1.414l4 4a1 1 0 001.424 0l8-8a1 1 0 000-1.419z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
+                <span
+                  className={`block truncate transition-all ${
+                    value.includes(option.value)
+                      ? "font-medium text-primary"
+                      : "font-normal text-black"
+                  }`}
+                >
+                  {option.label}
                 </span>
-              )}
+                {value.includes(option.value) && (
+                  <span className="absolute inset-y-0 right-0 flex items-center pr-4 text-primary">
+                    <svg
+                      className="h-5 w-5"
+                      xmlns="http://www.w3.org/2000/svg"
+                      viewBox="0 0 20 20"
+                      fill="currentColor"
+                      aria-hidden="true"
+                    >
+                      <path
+                        fillRule="evenodd"
+                        d="M16.704 5.293a1 1 0 00-1.416 0L8 12.586 4.712 9.298a1 1 0 10-1.424 1.414l4 4a1 1 0 001.424 0l8-8a1 1 0 000-1.419z"
+                        clipRule="evenodd"
+                      />
+                    </svg>
+                  </span>
+                )}
+              </div>
+            ))
+          ) : (
+            <div className="px-4 py-2 text-gray-500 text-sm">
+              Ничего не найдено
             </div>
-          ))}
+          )}
         </div>
       )}
     </div>
