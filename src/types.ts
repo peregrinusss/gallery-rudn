@@ -23,6 +23,7 @@ export type BookDetails = {
   idSRF?: number;
   city: string;
   idCity: number;
+  idSubjectRF: number;
   Authors: {
     idAuthor: number;
     surname: string;

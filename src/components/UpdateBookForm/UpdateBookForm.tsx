@@ -88,7 +88,7 @@ const UpdateBookForm: FC<Props> = ({ bookId, setIsEdit }) => {
         idPublisher: book.idPublisher,
         name: book.name,
         year: +book.yearPublisher,
-        idSRF: book.idSRF || null,
+        idSRF: book.idSubjectRF || null,
         Author: book.Authors.map((author) => author.idAuthor.toString()),
       });
     }
