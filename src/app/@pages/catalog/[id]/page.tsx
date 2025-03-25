@@ -6,6 +6,8 @@ import { Navigation, Pagination, A11y } from "swiper/modules";
 import { MdKeyboardArrowLeft } from "react-icons/md";
 import { HiPencil } from "react-icons/hi2";
 import { IoClose } from "react-icons/io5";
+import "@fancyapps/ui/dist/fancybox/fancybox.css";
+import { Fancybox } from "@fancyapps/ui";
 
 // Импорт Swiper стилей
 import "swiper/css";
@@ -46,6 +48,9 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
     if (bookId) {
       fetchBook();
     }
+
+    // Инициализация Fancybox после загрузки компонента
+    Fancybox.bind("[data-fancybox='gallery']");
   }, [bookId, getBook]);
 
   return (
@@ -155,13 +160,18 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
                   {book.Images.map((image, index) => (
                     <SwiperSlide key={index}>
                       <div className="w-full h-[260px] md:h-[340px] rounded-[10px] 2xl:h-[400px] relative overflow-hidden shadow-md">
-                        <Image
-                          alt="book"
-                          src={createImageSrc(image.path)}
-                          className="rounded-[20px]"
-                          fill
-                          style={{ objectFit: "contain" }}
-                        />
+                        <a
+                          href={createImageSrc(image.path)}
+                          data-fancybox="gallery"
+                        >
+                          <Image
+                            alt="book"
+                            src={createImageSrc(image.path)}
+                            className="rounded-[20px]"
+                            fill
+                            style={{ objectFit: "contain" }}
+                          />
+                        </a>
                       </div>
                     </SwiperSlide>
                   ))}
@@ -173,13 +183,18 @@ const Page: FC<CatalogPagesParams> = ({ params }) => {
                       key={index}
                       className="w-full h-[260px] md:h-[300px] rounded-[10px] relative overflow-hidden shadow-md bg-white"
                     >
-                      <Image
-                        alt="book"
-                        src={createImageSrc(image.path)}
-                        className="rounded-[20px]"
-                        fill
-                        style={{ objectFit: "contain" }}
-                      />
+                      <a
+                        href={createImageSrc(image.path)}
+                        data-fancybox="gallery"
+                      >
+                        <Image
+                          alt="book"
+                          src={createImageSrc(image.path)}
+                          className="rounded-[20px]"
+                          fill
+                          style={{ objectFit: "contain" }}
+                        />
+                      </a>
                     </div>
                   ))}
                 </div>
